@@ -1,0 +1,2 @@
+# QuickPay
+Digital money transfer system that enables users to send and receive funds instantly in a secure and efficient manner. Provides features such as user registration and authentication, wallet management, real-time transactions, and notifications. With role-based access for users and admins.
