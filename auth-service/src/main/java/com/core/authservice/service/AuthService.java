@@ -1,10 +1,10 @@
 package com.core.authservice.service;
 
+import com.core.authservice.security.SecurityUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -25,15 +25,15 @@ public class AuthService {
     private final UserDetailsService userDetailsService;
     private final JwtEncoder jwtEncoder;
 
-    public UserDetails authenticate(String phoneNumber, String password) {
+    public SecurityUser authenticate(String phoneNumber, String password) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(phoneNumber, password));
-        return userDetailsService.loadUserByUsername(phoneNumber);
+        return (SecurityUser) userDetailsService.loadUserByUsername(phoneNumber);
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(SecurityUser securityUser) {
         Instant now = Instant.now();
 
-        String scope = userDetails.getAuthorities().stream()
+        String scope = securityUser.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
 
@@ -41,7 +41,7 @@ public class AuthService {
                 .issuer("auth-service")
                 .issuedAt(now)
                 .expiresAt(now.plus(15, ChronoUnit.MINUTES))
-                .subject(userDetails.getUsername())
+                .subject(securityUser.user().getId().toString())
                 .claim("roles", scope)
                 .build();
 

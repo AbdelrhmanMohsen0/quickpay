@@ -2,6 +2,7 @@ package com.core.authservice.controller;
 
 import com.core.authservice.dto.LoginRequest;
 import com.core.authservice.dto.AuthResponse;
+import com.core.authservice.security.SecurityUser;
 import com.core.authservice.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        UserDetails userDetails = authService.authenticate(
+        SecurityUser securityUser = authService.authenticate(
                 loginRequest.phoneNumber(),
                 loginRequest.password()
         );
-        String tokenValue = authService.generateToken(userDetails);
+        String tokenValue = authService.generateToken(securityUser);
         return ResponseEntity.ok(new AuthResponse(tokenValue));
     }
 }

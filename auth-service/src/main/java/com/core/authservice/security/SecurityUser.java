@@ -1,7 +1,6 @@
 package com.core.authservice.security;
 
 import com.core.authservice.domain.User;
-import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
@@ -11,10 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@RequiredArgsConstructor
-public class SecurityUser implements UserDetails {
-
-    private final User user;
+public record SecurityUser(User user) implements UserDetails {
 
     @Override
     public @NonNull String getUsername() {
