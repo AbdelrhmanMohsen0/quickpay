@@ -11,6 +11,9 @@ import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.model.entity.TransactionStatus;
 import com.lodex.transactionservice.model.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +25,7 @@ public class TransactionService {
     private final TransactionDAO transactionDAO;
     private final UserDAO userDAO;
     private final TransactionMapper transactionMapper;
+    private final KafkaTemplate<?, ?> kafkaTemplate;
 
     public List<Transaction> getAllTransactions() {
         return transactionDAO.findAll();

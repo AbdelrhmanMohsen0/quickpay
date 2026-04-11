@@ -87,7 +87,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: transaction_db
     ports:
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - transaction_data:/var/lib/postgresql
 
