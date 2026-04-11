@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="authdb@localhost" uuid="3b47fbc1-dff7-421f-aa44-39b77011ebda">
+    <data-source source="LOCAL" name="authdb@localhost" uuid="c10000f9-042b-4727-8860-937bd2ffae26">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
@@ -13,11 +13,11 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="userdb@localhost" uuid="770ebc0d-c732-46fd-9a72-27f4a87ba946">
+    <data-source source="LOCAL" name="transaction_db@localhost" uuid="c68965a9-9c5d-426d-93d7-57367ea48473">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://localhost:5433/userdb</jdbc-url>
+      <jdbc-url>jdbc:postgresql://localhost:5433/transaction_db</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
