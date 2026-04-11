@@ -2,12 +2,13 @@ package com.core.authservice.controller;
 
 import com.core.authservice.dto.LoginRequest;
 import com.core.authservice.dto.AuthResponse;
+import com.core.authservice.dto.SignupRequest;
 import com.core.authservice.security.SecurityUser;
 import com.core.authservice.service.AuthService;
+import com.core.authservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
@@ -29,4 +31,11 @@ public class AuthController {
         String tokenValue = authService.generateToken(securityUser);
         return ResponseEntity.ok(new AuthResponse(tokenValue));
     }
+
+    @PostMapping("/signup")
+    public ResponseEntity<AuthResponse> signup(@Valid @RequestBody SignupRequest signupRequest) {
+        userService.createNewUser(signupRequest);
+        return login(new LoginRequest(signupRequest.phoneNumber(), signupRequest.password()));
+    }
+
 }
