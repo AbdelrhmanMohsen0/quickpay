@@ -25,7 +25,6 @@ public class UserService {
         kafkaProducerService.produceUserCreatedEvent(UserCreatedEvent.builder()
                 .id(user.getId())
                 .phoneNumber(user.getPhoneNumber())
-                .hashedPassword(user.getPassword())
                 .firstName(signupRequest.firstName())
                 .lastName(signupRequest.lastName())
                 .build()

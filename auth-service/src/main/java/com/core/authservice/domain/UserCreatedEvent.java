@@ -9,7 +9,6 @@ public record UserCreatedEvent(
         UUID id,
         String phoneNumber,
         String firstName,
-        String lastName,
-        String hashedPassword
+        String lastName
 ) {
 }
