@@ -9,7 +9,12 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopicConfig {
 
     @Bean
-    public NewTopic transactionTopic(){
-        return  TopicBuilder.name("transaction-topic").build();
+    public NewTopic transactionCreatedTopic(){
+        return  TopicBuilder.name("transaction.created").build();
+    }
+
+    @Bean
+    public NewTopic walletTransactionProcessedTopic(){
+        return  TopicBuilder.name("wallet.transaction.processed").build();
     }
 }
