@@ -1,7 +1,6 @@
 package com.notificationservice.model;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import com.notificationservice.domain.NotificationStatus;
 import com.notificationservice.domain.NotificationType;
