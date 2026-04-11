@@ -11,8 +11,6 @@ import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.model.entity.TransactionStatus;
 import com.lodex.transactionservice.model.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +23,7 @@ public class TransactionService {
     private final TransactionDAO transactionDAO;
     private final UserDAO userDAO;
     private final TransactionMapper transactionMapper;
-    private final KafkaTemplate<?, ?> kafkaTemplate;
+    private final KafkaProducerService kafkaProducerService;
 
     public List<Transaction> getAllTransactions() {
         return transactionDAO.findAll();
@@ -60,7 +58,7 @@ public class TransactionService {
         Transaction insertedTransaction = transactionDAO.save(newTransaction);
 
         // Publish to Kafka Topic for Wallet-Service
-
+        kafkaProducerService.produceTransactionCreatedEvenet(insertedTransaction);
 
         return insertedTransaction;
     }
