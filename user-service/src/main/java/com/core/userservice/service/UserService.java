@@ -21,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    public static final int USERS_SEARCH_RESULTS_LIMIT = 10;
 
     public UserDTO getUserById(UUID id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -42,14 +43,10 @@ public class UserService {
         return userMapper.toDTO(user);
     }
 
-    public List<UserDTO> getUsersByKeyword(String keyword) {
-        List<UserDTO> users = userRepository.findByKeyword(keyword, PageRequest.of(0, 10))
+    public List<UserDTO> getUsersByKeyword(String keyword, int limit) {
+        return userRepository.findByKeyword(keyword, PageRequest.of(0, limit))
                 .stream()
                 .map(userMapper::toDTO)
                 .toList();
-        if  (users.isEmpty()) {
-            throw new UserNotFoundException("User not found");
-        }
-        return users;
     }
 }
