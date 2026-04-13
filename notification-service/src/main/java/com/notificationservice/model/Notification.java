@@ -50,9 +50,10 @@ public class Notification {
 	
 	@NotNull
 	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
 	private NotificationStatus status = NotificationStatus.UNREAD;
 	
-	//Note: Instant is used instead of LocalDateTime for timezone-safe cross-service behavior.
+	// Note: Instant is used instead of LocalDateTime for timezone-safe cross-service behavior.
 	@NotNull
 	@Column(nullable = false)
 	private Instant createdAt =  Instant.now();
