@@ -1,6 +1,8 @@
 package com.core.userservice.service;
 
 import com.core.userservice.domain.User;
+import com.core.userservice.domain.UserStatus;
+import com.core.userservice.dto.UserCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,12 +15,20 @@ import tools.jackson.databind.ObjectMapper;
 public class KafkaListenerService {
 
     private final ObjectMapper objectMapper;
+    private final UserService userService;
 
     @KafkaListener(
             topics = "user.created",
             groupId = "groupId"
     )
     public void listener(String data) {
-        User createdUser = objectMapper.readValue(data, User.class);
+        UserCreatedEvent createdUser = objectMapper.readValue(data, UserCreatedEvent.class);
+        userService.saveUser(User.builder()
+                .id(createdUser.id())
+                .phoneNumber(createdUser.phoneNumber())
+                .firstName(createdUser.firstName())
+                .lastName(createdUser.lastName())
+                .status(UserStatus.ACTIVE)
+                .build());
     }
 }

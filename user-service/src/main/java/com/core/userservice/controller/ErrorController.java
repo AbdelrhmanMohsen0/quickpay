@@ -1,6 +1,6 @@
 package com.core.userservice.controller;
 
-import com.core.userservice.domain.APIErrorResponse;
+import com.core.userservice.dto.APIErrorResponse;
 import com.core.userservice.exception.UserForbiddenException;
 import com.core.userservice.exception.UserNotFoundException;
 import com.core.userservice.exception.UserUnauthorizedException;
@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -31,8 +32,8 @@ public class ErrorController {
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<APIErrorResponse> handleNoResourceFoundException(NoResourceFoundException ex) {
+    @ExceptionHandler({NoResourceFoundException.class, HttpRequestMethodNotSupportedException.class})
+    public ResponseEntity<APIErrorResponse> handleNoResourceFoundException(NoResourceFoundException ignoredEx) {
         APIErrorResponse error = APIErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .message("Not Found")

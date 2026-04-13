@@ -49,4 +49,8 @@ public class UserService {
                 .map(userMapper::toDTO)
                 .toList();
     }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
 }

@@ -1,4 +1,4 @@
-package com.core.userservice.domain;
+package com.core.userservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
