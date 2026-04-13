@@ -1,5 +1,6 @@
 package com.lodex.transactionservice.service;
 
+import com.lodex.transactionservice.dao.UserDAO;
 import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.model.entity.TransactionStatus;
 import com.lodex.transactionservice.model.entity.User;
@@ -13,6 +14,7 @@ import tools.jackson.databind.ObjectMapper;
 public class KafkaConsumerService {
 
     private final ObjectMapper objectMapper;
+    private final UserDAO userDAO;
 
     @KafkaListener(topics = "transaction.created", groupId = "transaction-group")
     public void transactionCreatedListen(String transactionStr) {
@@ -34,9 +36,10 @@ public class KafkaConsumerService {
     @KafkaListener(topics = "user.created", groupId = "user.created.group")
     public void userCreatedListen(String userStr) {
         User user = objectMapper.readValue(userStr, User.class);
-        System.out.println("NEW USER ID: " + user.getId());
+//        System.out.println("NEW USER ID: " + user.getId());
 
-        // I'll insert the user into 'users' table (now waiting for user-service to test this listener)
+        User saveUser = userDAO.save(user);
+        System.out.println("NEW SAVED USER ID: " + saveUser.getId());
     }
 
 }

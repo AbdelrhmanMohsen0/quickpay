@@ -13,8 +13,8 @@ public class KafkaProducerService {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
-    public void produceTransactionCreatedEvenet(Transaction transaction) {
+    public void produceTransactionCreatedEvent(Transaction transaction) {
         String event = objectMapper.writeValueAsString(transaction);
-        kafkaTemplate.send("transaction-topic", event);
+        kafkaTemplate.send("transaction.created", event);
     }
 }

@@ -58,7 +58,7 @@ public class TransactionService {
         Transaction insertedTransaction = transactionDAO.save(newTransaction);
 
         // Publish to Kafka Topic for Wallet-Service
-        kafkaProducerService.produceTransactionCreatedEvenet(insertedTransaction);
+        kafkaProducerService.produceTransactionCreatedEvent(insertedTransaction);
 
         return insertedTransaction;
     }
