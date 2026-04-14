@@ -8,6 +8,6 @@ import java.util.UUID;
 
 @Data
 public class WalletResponseDTO {
-    private UUID userId;
+    private UUID walletId;
     private BigDecimal balance;
 }

@@ -31,7 +31,7 @@ public class WalletMapper implements IWalletMapper {
         WalletResponseDTO dto = new WalletResponseDTO();
 
         dto.setBalance(entity.getBalance());
-        dto.setUserId(entity.getUserId());
+        dto.setWalletId(entity.getId());
 
         return dto;
     }
