@@ -1,7 +1,11 @@
-package com.notificationservice.service;
+package com.core.notificationservice.service;
 
-import java.util.List;import com.notificationservice.domain.NotificationStatus;import com.notificationservice.model.Notification;
-import com.notificationservice.repository.NotificationRepo;import lombok.RequiredArgsConstructor;import org.springframework.stereotype.Service;
+import java.util.List;
+import com.core.notificationservice.domain.NotificationStatus;
+import com.core.notificationservice.model.Notification;
+import com.core.notificationservice.repository.NotificationRepo;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor

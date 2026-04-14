@@ -1,6 +1,8 @@
-package com.notificationservice.repository;
+package com.core.notificationservice.repository;
 
-import java.util.List;import com.notificationservice.domain.NotificationStatus;import com.notificationservice.model.Notification;
+import java.util.List;
+import com.core.notificationservice.domain.NotificationStatus;
+import com.core.notificationservice.model.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

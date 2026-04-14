@@ -1,4 +1,4 @@
-package com.notificationservice.domain;
+package com.core.notificationservice.domain;
 
 public enum NotificationType {
 	
