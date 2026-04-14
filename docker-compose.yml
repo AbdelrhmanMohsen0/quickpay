@@ -102,6 +102,33 @@ services:
         SPRING_DATASOURCE_USERNAME: ${DB_USER}
         SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
         SERVER_PORT: 8083
+  # --- WALLET MICROSERVICE ---
+  wallet-db:
+    image: postgres:latest
+    container_name: wallet-db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: wallet_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - wallet_data:/var/lib/postgresql
+
+  wallet-service:
+      build: ./wallet-service
+      container_name: wallet-service
+      depends_on:
+        - wallet-db
+        - kafka
+      ports:
+        - "8085:8083"
+      environment:
+        SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+        SPRING_DATASOURCE_URL: jdbc:postgresql://transaction-db:5436/wallet_db
+        SPRING_DATASOURCE_USERNAME: ${DB_USER}
+        SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+        SERVER_PORT: 8085
 
   # --- NOTIFICATION MICROSERVICE ---
   notification-db:
@@ -146,4 +173,5 @@ volumes:
   auth_data:
   user_data:
   transaction_data:
+  wallet_data:
   notification_data:
