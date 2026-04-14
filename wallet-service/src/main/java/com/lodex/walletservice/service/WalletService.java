@@ -21,6 +21,7 @@ public class WalletService {
 
     public WalletResponseDTO getWalletByUserId(UUID userId) {
         Wallet userWallet = walletRepo.findByUserId(userId);
+
         if(userWallet == null){
             throw new WalletNotFound("Wallet is under creation, try again later.");
         }

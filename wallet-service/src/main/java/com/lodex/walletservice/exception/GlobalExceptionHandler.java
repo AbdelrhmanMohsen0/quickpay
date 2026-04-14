@@ -33,9 +33,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    // If wallet is not created yet
+    // if a user inquired his balance before this service receive user.created event
     @ExceptionHandler(WalletNotFound.class)
-    public ResponseEntity<Map<String, String>> handleWalletNotFoundExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Map<String, String>> handleWalletNotFoundExceptions(WalletNotFound ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("message", ex.getMessage()));
     }
