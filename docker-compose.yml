@@ -40,15 +40,13 @@ services:
     depends_on:
       - auth-db
       - kafka
-    ports:
-      - "8081:8081"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/${AUTH_DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-      SERVER_PORT: 8081
+      SERVER_PORT: 8080
 
   # USER SERVICE POSTGRES DATABASE
   user-db:
@@ -70,14 +68,12 @@ services:
     depends_on:
       - user-db
       - kafka
-    ports:
-      - "8082:8082"
     environment:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_DATASOURCE_URL: jdbc:postgresql://user-db:5432/${USER_DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SERVER_PORT: 8082
+      SERVER_PORT: 8080
 
   # --- TRANSACTION MICROSERVICE ---
   transaction-db:
@@ -129,6 +125,20 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SERVER_PORT: 8084
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      - auth-service
+      - user-service
+    ports:
+      - "8080:8080"
+    environment:
+      SERVER_PORT: 8080
+      JWT_SECRET: ${JWT_SECRET}
+      AUTH_SERVICE_URI: http://auth-service:8080
+      USER_SERVICE_URI: http://user-service:8080
 volumes:
   auth_data:
   user_data:

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping
 public class AuthController {
 
     private final AuthService authService;
@@ -44,6 +44,6 @@ public class AuthController {
             @AuthenticationPrincipal Jwt currentUser) {
 
         userService.changePassword(currentUser.getSubject(), request);
-        return ResponseEntity.noContent().build();  
+        return ResponseEntity.noContent().build();
     }
 }
