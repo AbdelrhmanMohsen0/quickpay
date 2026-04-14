@@ -1,7 +1,8 @@
 package com.lodex.walletservice.service;
 
-import com.lodex.walletservice.model.entity.Transaction;
-import com.lodex.walletservice.repository.WalletRepo;
+import com.lodex.walletservice.exception.NotEnoughFundException;
+import com.lodex.walletservice.exception.WalletNotFoundException;
+import com.lodex.walletservice.model.dto.TransactionEventDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -15,19 +16,25 @@ import java.util.UUID;
 public class KafkaConsumerService {
 
     private final ObjectMapper objectMapper;
-    private final WalletRepo  walletRepo;
     private final WalletService  walletService;
 
-    @KafkaListener(topics = "transaction.created", groupId = "transaction-group")
+    @KafkaListener(topics = "transaction.created", groupId = "wallet-service-group")
     public void transactionCreatedListen(String transactionStr) {
-        // I'll save it to the DB later
-        Transaction transaction = objectMapper.readValue(transactionStr, Transaction.class);
-        System.out.println("Processing Transaction ID: " + transaction.getId());
+        System.out.println("Received transaction created: " + transactionStr);
+        try {
+            TransactionEventDTO dto = objectMapper.readValue(transactionStr, TransactionEventDTO.class);
+            walletService.transfer(dto);
+        } catch (WalletNotFoundException | NotEnoughFundException e) {
+            System.err.println(e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @KafkaListener(topics = "user.created", groupId = "user.created.group")
+    @KafkaListener(topics = "user.created", groupId = "wallet-service-group")
     public void userCreatedListen(String userStr) {
-        // get user id
+//        System.out.println(userStr);
+//        // get user id
         JsonNode root = objectMapper.readTree(userStr);
         String idString = root.get("id").asText();
         UUID userId = UUID.fromString(idString);
