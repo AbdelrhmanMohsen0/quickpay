@@ -1,6 +1,6 @@
 package com.lodex.walletservice.controller;
 
-import com.lodex.walletservice.model.dto.WalletDTO;
+import com.lodex.walletservice.model.dto.WalletResponseDTO;
 import com.lodex.walletservice.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +16,10 @@ public class WalletController {
     private WalletService walletService;
 
     @GetMapping
-    public ResponseEntity<WalletDTO> getBalance(@RequestHeader("X-User-Id") UUID userId) {
-        WalletDTO wallet = walletService.getWalletByUserId(userId);
+    public ResponseEntity<WalletResponseDTO> getBalance(@RequestHeader("X-User-Id") UUID userId) {
+        System.out.println("Getting balance");
+        System.out.println(userId);
+        WalletResponseDTO wallet = walletService.getWalletByUserId(userId);
         return ResponseEntity.ok(wallet);
     }
 

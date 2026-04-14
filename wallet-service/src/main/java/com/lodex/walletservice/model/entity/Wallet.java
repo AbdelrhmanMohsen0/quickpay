@@ -14,9 +14,10 @@ public class Wallet {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String userId;
+    @Column(unique = true, nullable = false)
+    private UUID userId;
 
     @Column(precision = 19, scale = 4)
-    private BigDecimal balance;
+    private BigDecimal balance = BigDecimal.ZERO;
 
 }
