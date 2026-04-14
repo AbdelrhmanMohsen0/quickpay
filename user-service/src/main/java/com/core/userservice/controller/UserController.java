@@ -24,23 +24,23 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUser(@PathVariable UUID id,
-                                           @RequestHeader("X-User-Id") UUID headerId) {
-        if (!id.equals(headerId)) {
-            throw new UserUnauthorizedException("Unauthorized");
+    public ResponseEntity<UserDTO> getUserById(@PathVariable UUID id,
+                                           @RequestHeader("X-User-Role") UserRole userRole) {
+        if (!userRole.equals(UserRole.ROLE_ADMIN)) {
+            throw new UserForbiddenException("You are not allowed to perform this operation");
         }
 
         return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
     }
 
-    @PatchMapping("/{id}/name")
-    public ResponseEntity<UserDTO> updateUserName(@PathVariable UUID id,
-                                                  @RequestHeader("X-User-Id") UUID headerId,
-                                                  @Valid @RequestBody UserNameUpdateRequest userNameUpdateRequest) {
-        if (!id.equals(headerId)) {
-            throw new UserUnauthorizedException("Unauthorized");
-        }
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getCurrentUser(@RequestHeader("X-User-Id") UUID id) {
+        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+    }
 
+    @PatchMapping("/me/name")
+    public ResponseEntity<UserDTO> updateCurrentUser(@RequestHeader("X-User-Id") UUID id,
+                                                     @Valid @RequestBody UserNameUpdateRequest userNameUpdateRequest) {
         return new ResponseEntity<>(userService.updateUserName(id, userNameUpdateRequest), HttpStatus.OK);
     }
 
