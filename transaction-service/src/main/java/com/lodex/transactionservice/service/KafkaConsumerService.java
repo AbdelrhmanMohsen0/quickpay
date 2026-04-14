@@ -15,8 +15,9 @@ public class KafkaConsumerService {
 
     private final ObjectMapper objectMapper;
     private final UserDAO userDAO;
+    private final String groupId = "transaction-group";
 
-    @KafkaListener(topics = "transaction.created", groupId = "transaction-group")
+    @KafkaListener(topics = "transaction.created", groupId = groupId)
     public void transactionCreatedListen(String transactionStr) {
         Transaction transaction = objectMapper.readValue(transactionStr, Transaction.class);
 
@@ -24,7 +25,7 @@ public class KafkaConsumerService {
         System.out.println("Amount: " + transaction.getAmount());
     }
 
-    @KafkaListener(topics = "wallet.transaction.processed", groupId = "wallet.transaction.group")
+    @KafkaListener(topics = "wallet.transaction.processed", groupId = groupId)
     public void walletTransactionProcessedListen(String transactionStr) {
         Transaction transaction = objectMapper.readValue(transactionStr, Transaction.class);
         transaction.setStatus(TransactionStatus.SUCCESS);
@@ -33,13 +34,18 @@ public class KafkaConsumerService {
         System.out.println("Amount: " + transaction.getAmount());
     }
 
-    @KafkaListener(topics = "user.created", groupId = "user.created.group")
+    @KafkaListener(topics = "user.created", groupId = groupId)
     public void userCreatedListen(String userStr) {
         User user = objectMapper.readValue(userStr, User.class);
-//        System.out.println("NEW USER ID: " + user.getId());
-
         User saveUser = userDAO.save(user);
         System.out.println("NEW SAVED USER ID: " + saveUser.getId());
+    }
+
+    @KafkaListener(topics = "user.updated", groupId = groupId)
+    public void userUpdatedListen(String userStr) {
+        User user = objectMapper.readValue(userStr, User.class);
+        User saveUser = userDAO.save(user);
+        System.out.println("UPDATED USER ID: " + saveUser.getId());
     }
 
 }
