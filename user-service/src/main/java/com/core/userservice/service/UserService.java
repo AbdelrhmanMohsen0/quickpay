@@ -21,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final KafkaProducerService kafkaProducerService;
     public static final int USERS_SEARCH_RESULTS_LIMIT = 10;
 
     public UserDTO getUserById(UUID id) {
@@ -33,6 +34,7 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
         user.setFirstName(userNameUpdateRequest.firstName());
         user.setLastName(userNameUpdateRequest.lastName());
+        produceUserUpdatedEvent(user);
         return userMapper.toDTO(user);
     }
 
@@ -40,6 +42,7 @@ public class UserService {
     public UserDTO updateUserStatus(UUID id, UserStatusUpdateRequest userStatusUpdateRequest) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
         user.setStatus(userStatusUpdateRequest.userStatus());
+        produceUserUpdatedEvent(user);
         return userMapper.toDTO(user);
     }
 
@@ -52,5 +55,15 @@ public class UserService {
 
     public void saveUser(User user) {
         userRepository.save(user);
+    }
+
+    private void produceUserUpdatedEvent(User user) {
+        kafkaProducerService.produceUserUpdatedEvent(UserDTO.builder()
+                .id(user.getId())
+                .phoneNumber(user.getPhoneNumber())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .status(user.getStatus())
+                .build());
     }
 }
