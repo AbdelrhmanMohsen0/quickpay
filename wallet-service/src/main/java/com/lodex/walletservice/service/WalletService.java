@@ -58,10 +58,8 @@ public class WalletService {
             throw new WalletNotFoundException("Sender wallet not found");
 
         // Check if sender has enough money
-        if (senderWallet.getBalance().compareTo(dto.getAmount()) < 0) {
-            dto.setStatus("REJECTED");
+        if (senderWallet.getBalance().compareTo(dto.getAmount()) < 0)
             throw new NotEnoughFundException("Sender does not have enough funds to complete the transfer.");
-        }
 
         // Get receiver wallet
         Wallet receiverWallet = walletRepo.findByUserId(dto.getReceiverId());
@@ -76,8 +74,5 @@ public class WalletService {
         walletRepo.save(senderWallet);
         walletRepo.save(receiverWallet);
 
-        dto.setStatus("SUCCESS");
-
-        // publish to Kafka
     }
 }
