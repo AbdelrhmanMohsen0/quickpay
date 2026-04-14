@@ -33,7 +33,7 @@ public class ErrorController {
     }
 
     @ExceptionHandler({NoResourceFoundException.class, HttpRequestMethodNotSupportedException.class})
-    public ResponseEntity<APIErrorResponse> handleNoResourceFoundException(NoResourceFoundException ignoredEx) {
+    public ResponseEntity<APIErrorResponse> handleNoResourceFoundException(Exception ignoredEx) {
         APIErrorResponse error = APIErrorResponse.builder()
                 .status(HttpStatus.NOT_FOUND.value())
                 .message("Not Found")

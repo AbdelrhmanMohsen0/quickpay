@@ -1,5 +1,6 @@
 package com.core.authservice.controller;
 
+import com.core.authservice.dto.ChangePasswordRequest;
 import com.core.authservice.dto.LoginRequest;
 import com.core.authservice.dto.AuthResponse;
 import com.core.authservice.dto.SignupRequest;
@@ -9,10 +10,9 @@ import com.core.authservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -38,4 +38,12 @@ public class AuthController {
         return login(new LoginRequest(signupRequest.phoneNumber(), signupRequest.password()));
     }
 
+    @PatchMapping("/change-password")
+    public ResponseEntity<Void> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request,
+            @AuthenticationPrincipal Jwt currentUser) {
+
+        userService.changePassword(currentUser.getSubject(), request);
+        return ResponseEntity.noContent().build();  
+    }
 }
