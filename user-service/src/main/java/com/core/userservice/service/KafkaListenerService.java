@@ -1,6 +1,9 @@
 package com.core.userservice.service;
 
 import com.core.userservice.domain.User;
+import com.core.userservice.domain.UserStatus;
+import com.core.userservice.dto.UserCreatedEvent;
+import com.core.userservice.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -13,12 +16,29 @@ import tools.jackson.databind.ObjectMapper;
 public class KafkaListenerService {
 
     private final ObjectMapper objectMapper;
+    private final UserService userService;
 
     @KafkaListener(
             topics = "user.created",
             groupId = "groupId"
     )
     public void listener(String data) {
-        User createdUser = objectMapper.readValue(data, User.class);
+        UserCreatedEvent createdUser = objectMapper.readValue(data, UserCreatedEvent.class);
+        userService.saveUser(User.builder()
+                .id(createdUser.id())
+                .phoneNumber(createdUser.phoneNumber())
+                .firstName(createdUser.firstName())
+                .lastName(createdUser.lastName())
+                .status(UserStatus.ACTIVE)
+                .build());
+    }
+
+    @KafkaListener(
+            topics = "user.updated",
+            groupId = "groupId"
+    )
+    public void testListener(String data) {
+        UserDTO createdUser = objectMapper.readValue(data, UserDTO.class);
+        System.out.println(createdUser.firstName() +  " " + createdUser.lastName() + createdUser.status());
     }
 }
