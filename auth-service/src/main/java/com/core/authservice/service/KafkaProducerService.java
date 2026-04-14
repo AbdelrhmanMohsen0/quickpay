@@ -14,7 +14,7 @@ public class KafkaProducerService {
     private final ObjectMapper objectMapper;
 
     public void produceUserCreatedEvent(UserCreatedEvent userCreatedEvent) {
-        String event =  objectMapper.writeValueAsString(userCreatedEvent);
+        String event = objectMapper.writeValueAsString(userCreatedEvent);
         kafkaTemplate.send("user.created", event);
     }
 }
