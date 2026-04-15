@@ -5,6 +5,7 @@ import com.lodex.transactionservice.dao.UserDAO;
 import com.lodex.transactionservice.exception.DuplicateTransactionException;
 import com.lodex.transactionservice.exception.UserNotFoundException;
 import com.lodex.transactionservice.mapper.TransactionMapper;
+import com.lodex.transactionservice.model.dto.TransactionsResponseDTO;
 import com.lodex.transactionservice.model.dto.TransferRequestDTO;
 import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.model.entity.TransactionStatus;
@@ -22,11 +23,12 @@ public class TransactionService {
     private final TransactionMapper transactionMapper;
     private final KafkaProducerService kafkaProducerService;
 
-    public List<Transaction> getTransactionsByUserId(String userId) {
-        List<Transaction> transactions = transactionDAO.findBySenderId(userId);
+    public List<TransactionsResponseDTO> getTransactionsByUserId(String userId) {
+        List<Transaction> transactions = transactionDAO.findUserTransactionsByStatus(userId, TransactionStatus.SUCCESS);
+        List<TransactionsResponseDTO> dto = transactionMapper.toTransactionsResponseDTO(transactions, userId);
         System.out.println("getTransactionsByUserId: " + transactions);
 
-        return transactions;
+        return dto;
     }
 
     public Transaction createTransaction(TransferRequestDTO dto, String idempotencyKey) {
