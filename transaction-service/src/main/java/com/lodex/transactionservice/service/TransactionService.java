@@ -6,16 +6,13 @@ import com.lodex.transactionservice.exception.DuplicateTransactionException;
 import com.lodex.transactionservice.exception.UserNotFoundException;
 import com.lodex.transactionservice.mapper.TransactionMapper;
 import com.lodex.transactionservice.model.dto.TransferRequestDTO;
-import com.lodex.transactionservice.model.dto.TransferResponseDTO;
 import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.model.entity.TransactionStatus;
 import com.lodex.transactionservice.model.entity.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,17 +22,11 @@ public class TransactionService {
     private final TransactionMapper transactionMapper;
     private final KafkaProducerService kafkaProducerService;
 
-    public List<Transaction> getAllTransactions() {
-        return transactionDAO.findAll();
-    }
-
-
-    public List<TransferResponseDTO> getTransactionsByUserId(String userId) {
+    public List<Transaction> getTransactionsByUserId(String userId) {
         List<Transaction> transactions = transactionDAO.findBySenderId(userId);
+        System.out.println("getTransactionsByUserId: " + transactions);
 
-        return transactions.stream()
-                .map(transactionMapper::toResponseDto)
-                .collect(Collectors.toList());
+        return transactions;
     }
 
     public Transaction createTransaction(TransferRequestDTO dto, String idempotencyKey) {

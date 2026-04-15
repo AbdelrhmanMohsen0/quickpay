@@ -21,13 +21,9 @@ public class TransactionController {
     private final TransactionMapper transactionMapper;
 
     @GetMapping
-    public List<Transaction> getAllTransactions() {
-        return transactionService.getAllTransactions();
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<TransferResponseDTO>> getTransactionsByUserId(@PathVariable String userId) {
-        List<TransferResponseDTO> transactions = transactionService.getTransactionsByUserId(userId);
+    public ResponseEntity<List<Transaction>> getTransactionsByUserId(@RequestHeader("X-User-Id") String userId) {
+        System.out.println("getTransactionsByUserId: " + userId);
+        List<Transaction> transactions = transactionService.getTransactionsByUserId(userId);
 
         if (transactions.isEmpty()) {
             return ResponseEntity.noContent().build(); // Returns 204 if they have no history
