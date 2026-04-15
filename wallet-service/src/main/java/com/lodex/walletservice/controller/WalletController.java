@@ -8,13 +8,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/balance")
 @RequiredArgsConstructor
 public class WalletController {
 
     private final WalletService walletService;
 
-    @GetMapping
+    @GetMapping("balance")
     public ResponseEntity<WalletResponseDTO> getBalance(@RequestHeader("X-User-Id") UUID userId) {
         WalletResponseDTO wallet = walletService.getWalletByUserId(userId);
         return ResponseEntity.ok(wallet);
