@@ -19,11 +19,11 @@ public class NotificationService {
 	}
 	
 	public List<Notification> findAllByUserId(long userId) {
-		return notificationRepo.findAllByUserId(userId);
+		return notificationRepo.findAllByReceiverId(userId);
 	}
 	
 	public List<Notification> findAllByUserIdAndStatus(long userId, NotificationStatus status) {
-		return notificationRepo.findAllByUserIdAndStatus(userId, status);
+		return notificationRepo.findAllByReceiverIdAndStatus(userId, status);
 	}
 	
 	public Notification save(Notification notification) {

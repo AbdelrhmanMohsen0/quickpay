@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class AppProperties {
 	
 	private UUID systemUserId;
+	private String systemUserName;
 	
 	public UUID getSystemUserId() {
 		return systemUserId;
@@ -16,5 +17,12 @@ public class AppProperties {
 	
 	public void setSystemUserId(UUID systemUserId) {
 		this.systemUserId = systemUserId;
+	}
+	
+	public void setSystemUserName(String systemUserName) {
+		this.systemUserName = systemUserName;
+	}
+	public String getSystemUserName() {
+			return systemUserName;
 	}
 }

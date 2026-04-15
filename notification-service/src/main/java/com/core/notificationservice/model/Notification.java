@@ -23,13 +23,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name="notifications")
-@RequiredArgsConstructor
-@AllArgsConstructor
-@NoArgsConstructor
 public class Notification {
 	
 	@Id
@@ -40,7 +39,13 @@ public class Notification {
 	private UUID senderId;
 	
 	@NotNull
+	private String senderName;
+	
+	@NotNull
 	private UUID receiverId;
+	
+	@NotNull
+	private String receiverName;
 	
 	@NotNull
 	@Column(nullable = false)
@@ -62,19 +67,18 @@ public class Notification {
 	@NotNull
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
+	@Builder.Default
 	private NotificationStatus status = NotificationStatus.UNREAD;
 	
 	@Column(columnDefinition = "TEXT")
 	private String metadata;
 	
 	// Note: Instant is used instead of LocalDateTime for timezone-safe cross-service behavior.
-	@NotNull
 	@Column(nullable = false)
-	private Instant createdAt =  Instant.now();
+	private Instant createdAt;
 	
-	@NotNull
 	@Column(nullable = false)
-	private Instant updatedAt =  Instant.now();
+	private Instant updatedAt;
 
 	private Instant readAt;
 	

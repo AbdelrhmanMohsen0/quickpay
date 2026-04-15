@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface NotificationRepo extends JpaRepository<Notification, Long> {
 
-	List<Notification> findAllByUserId(Long userId);
+	List<Notification> findAllByReceiverId(Long receiverId);
 	
-	List<Notification> findAllByUserIdAndStatus(Long userId, NotificationStatus status);
+	List<Notification> findAllByReceiverIdAndStatus(Long receiverId, NotificationStatus status);
 }

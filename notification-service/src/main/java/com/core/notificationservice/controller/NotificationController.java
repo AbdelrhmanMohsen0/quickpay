@@ -7,8 +7,8 @@ import com.core.notificationservice.model.Notification;import org.springframewor
 @RequestMapping("/api/v1/notification")
 public class NotificationController {
 	
-	@GetMapping("/")
-	public Notification test(){
-		return null;
-	}
+//	@GetMapping("/")
+//	public Notification test(){
+//		return Notification.builder().build();
+//	}
 }
