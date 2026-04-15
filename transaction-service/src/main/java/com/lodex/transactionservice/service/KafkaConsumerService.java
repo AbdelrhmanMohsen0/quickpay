@@ -24,7 +24,7 @@ public class KafkaConsumerService {
     public void listenWalletTransactionProcessed(String transactionStr) {
         Transaction processedTransaction = objectMapper.readValue(transactionStr, Transaction.class);
         Transaction updatedTransaction = transactionService.updateTransaction(processedTransaction);
-//        kafkaProducerService.produceTransactionNotificationEvent(updatedTransaction);
+        kafkaProducerService.produceTransactionNotificationEvent(updatedTransaction);
     }
 
     @KafkaListener(topics = "user.created", groupId = groupId)
