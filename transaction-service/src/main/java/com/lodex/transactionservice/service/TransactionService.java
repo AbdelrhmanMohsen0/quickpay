@@ -62,4 +62,12 @@ public class TransactionService {
 
         return insertedTransaction;
     }
+
+    public Transaction updateTransaction(Transaction processedTransaction) {
+        Transaction existingTransaction = transactionDAO.findById(processedTransaction.getId());
+        existingTransaction.setStatus(processedTransaction.getStatus());
+        existingTransaction.setRejectionReason(processedTransaction.getRejectionReason());
+
+        return transactionDAO.save(existingTransaction);
+    }
 }

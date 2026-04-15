@@ -29,7 +29,7 @@ public class KafkaConsumerService {
             dto.setStatus(String.valueOf(TransactionStatus.SUCCESS));
         } catch (Exception e) {
             dto.setStatus(String.valueOf(TransactionStatus.REJECTED));
-            dto.setRejectedReason(e.getMessage());
+            dto.setRejectionReason(e.getMessage());
             System.err.println(e.getMessage());
         } finally {
             kafkaProducerService.produceTransactionProcessedEvent(dto);

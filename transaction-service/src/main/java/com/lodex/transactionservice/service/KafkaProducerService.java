@@ -17,4 +17,8 @@ public class KafkaProducerService {
         String event = objectMapper.writeValueAsString(transaction);
         kafkaTemplate.send("transaction.created", event);
     }
+    public void produceTransactionNotificationEvent(Transaction transaction) {
+        String event = objectMapper.writeValueAsString(transaction);
+        kafkaTemplate.send("transaction.notification", event);
+    }
 }

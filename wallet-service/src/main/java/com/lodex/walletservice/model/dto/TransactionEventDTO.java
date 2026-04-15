@@ -15,5 +15,5 @@ public class TransactionEventDTO {
     private UUID senderId;
     private String status;
     private LocalDateTime timestamp;
-    private String rejectedReason;
+    private String rejectionReason;
 }
