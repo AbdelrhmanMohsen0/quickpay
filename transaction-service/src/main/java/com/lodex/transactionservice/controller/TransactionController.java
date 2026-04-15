@@ -33,8 +33,9 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<TransferResponseDTO> createTransaction(@Valid @RequestBody TransferRequestDTO transferRequestDTO, @Valid @RequestHeader("Idempotency-Key") String idempotencyKey) {
-        Transaction newTransaction = transactionService.createTransaction(transferRequestDTO, idempotencyKey);
+    public ResponseEntity<TransferResponseDTO> createTransaction(@Valid @RequestBody TransferRequestDTO dto, @Valid @RequestHeader("X-User-Id") String userId, @Valid @RequestHeader("Idempotency-Key") String idempotencyKey) {
+        dto.setSenderId(userId);
+        Transaction newTransaction = transactionService.createTransaction(dto, idempotencyKey);
         return ResponseEntity.ok(transactionMapper.toResponseDto(newTransaction));
     }
 }
