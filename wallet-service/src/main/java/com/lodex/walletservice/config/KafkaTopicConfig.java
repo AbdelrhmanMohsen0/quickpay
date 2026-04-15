@@ -1,4 +1,4 @@
-package com.lodex.transactionservice.config;
+package com.lodex.walletservice.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
@@ -9,17 +9,7 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopicConfig {
 
     @Bean
-    public NewTopic transactionCreatedTopic(){
-        return  TopicBuilder.name("transaction.created").build();
-    }
-
-    @Bean
     public NewTopic walletTransactionProcessedTopic(){
         return  TopicBuilder.name("wallet.transaction.processed").build();
-    }
-
-    @Bean
-    public NewTopic transactionNotificationTopic(){
-        return  TopicBuilder.name("transaction.notification").build();
     }
 }

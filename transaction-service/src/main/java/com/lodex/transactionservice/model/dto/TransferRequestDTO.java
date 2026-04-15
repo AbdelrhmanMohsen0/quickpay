@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 @Data
 public class TransferRequestDTO {
 
-    @NotBlank(message = "Sender ID is required")
+    // will be assigned from the req header
     private String senderId;
 
     @NotBlank(message = "Receiver phone number is required")

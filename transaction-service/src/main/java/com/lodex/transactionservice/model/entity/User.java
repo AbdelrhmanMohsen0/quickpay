@@ -10,7 +10,6 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(unique = true, nullable = false)
@@ -19,4 +18,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private UserStatus status;
 
+    private String firstName;
+
+    private String lastName;
 }

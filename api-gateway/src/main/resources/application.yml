@@ -19,3 +19,17 @@ spring:
                 - Path=/api/v1/users/**
               filters:
                 - StripPrefix=3
+
+            - id: transaction-service
+              uri: ${TRANSACTION_SERVICE_URI}
+              predicates:
+                - Path=/api/v1/transaction/**
+              filters:
+                - StripPrefix=3
+
+            - id: wallet-service
+              uri: ${WALLET_SERVICE_URI}
+              predicates:
+                - Path=/api/v1/wallet/**
+              filters:
+                - StripPrefix=3
