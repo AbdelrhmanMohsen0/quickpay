@@ -18,6 +18,10 @@ public class NotificationService {
 				-> new RuntimeException("Notification not found"));
 	}
 	
+	public List<Notification> findAll() {
+		return notificationRepo.findAll();
+	}
+	
 	public List<Notification> findAllByUserId(long userId) {
 		return notificationRepo.findAllByReceiverId(userId);
 	}

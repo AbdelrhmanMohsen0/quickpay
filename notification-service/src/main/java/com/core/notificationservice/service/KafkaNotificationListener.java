@@ -19,9 +19,10 @@ public class KafkaNotificationListener {
 	private final ObjectMapper objectMapper;
 	
 	@KafkaListener(topics = "transaction.notification", groupId = "notification-group")
-	public void handleTransaction(TransactionCreatedEvent event) {
+	public void handleTransaction(String message) {
+		TransactionCreatedEvent transaction = objectMapper.readValue(message, TransactionCreatedEvent.class);
 		
-		var notifications = transactionHandler.handle(event);
+		var notifications = transactionHandler.handle(transaction);
 		
 		notifications.forEach(notificationService::save);
 	}
