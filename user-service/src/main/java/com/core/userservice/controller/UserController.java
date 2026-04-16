@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping
 @RequiredArgsConstructor
 public class UserController {
 
@@ -55,7 +55,7 @@ public class UserController {
         return new ResponseEntity<>(userService.updateUserStatus(id, userStatusUpdateRequest), HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<UserDTO>> getUsers(@RequestParam String keyword,
                                                   @RequestHeader("X-User-Role") UserRole userRole) {
         if (!userRole.equals(UserRole.ROLE_ADMIN)) {
