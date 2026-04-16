@@ -29,7 +29,7 @@ export function AuthPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-md shadow-lg py-10 px-3">
+      <Card className="w-full max-w-md px-3 py-10 shadow-lg">
         <CardHeader className="space-y-2 text-center">
           <div className="mb-2 flex justify-center">
             <div className="flex size-12 items-center justify-center rounded-xl bg-primary/10 text-primary">

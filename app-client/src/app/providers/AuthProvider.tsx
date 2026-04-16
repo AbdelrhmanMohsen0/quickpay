@@ -7,7 +7,6 @@ import {
 } from "./AuthContext";
 import api from "@/lib/axios";
 import { jwtDecode } from "jwt-decode";
-import { useNavigate } from "react-router-dom";
 
 type Props = {
   children: React.ReactNode;
@@ -90,7 +89,7 @@ export const AuthProvider = ({ children }: Props) => {
     localStorage.removeItem("access_token");
     setUser(null);
 
-    window.location.href = "/auth/login";
+    window.location.href = "/auth";
     // navigate("/auth/login");
   };
 

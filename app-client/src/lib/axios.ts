@@ -43,7 +43,7 @@ api.interceptors.response.use(
       removeAccessToken();
 
       // Redirect to login
-      window.location.href = "/auth/login";
+      window.location.href = "/auth";
     }
 
     return Promise.reject(error);
