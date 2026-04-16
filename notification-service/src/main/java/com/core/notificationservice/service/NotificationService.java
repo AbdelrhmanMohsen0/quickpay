@@ -1,6 +1,6 @@
 package com.core.notificationservice.service;
 
-import java.util.List;
+import java.util.List;import java.util.UUID;
 import com.core.notificationservice.domain.NotificationStatus;
 import com.core.notificationservice.model.Notification;
 import com.core.notificationservice.repository.NotificationRepo;
@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationService {
 	
+	// todo: check idempotencyKey for duplicate notifications
+	// todo: add websockets
+	
 	private final NotificationRepo notificationRepo;
 
-	public Notification findById(long id) {
+	public Notification findById(UUID id) {
 		return notificationRepo.findById(id).orElseThrow(()
 				-> new RuntimeException("Notification not found"));
 	}
@@ -22,12 +25,12 @@ public class NotificationService {
 		return notificationRepo.findAll();
 	}
 	
-	public List<Notification> findAllByUserId(long userId) {
-		return notificationRepo.findAllByReceiverId(userId);
+	public List<Notification> findAllByReceiverId(UUID receiverId) {
+		return notificationRepo.findAllByReceiverId(receiverId);
 	}
 	
-	public List<Notification> findAllByUserIdAndStatus(long userId, NotificationStatus status) {
-		return notificationRepo.findAllByReceiverIdAndStatus(userId, status);
+	public List<Notification> findAllByUserIdAndStatus(UUID receiverId, NotificationStatus status) {
+		return notificationRepo.findAllByReceiverIdAndStatus(receiverId, status);
 	}
 	
 	public Notification save(Notification notification) {
