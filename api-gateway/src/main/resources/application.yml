@@ -37,3 +37,14 @@ spring:
                 - Path=/api/v1/wallet/**
               filters:
                 - StripPrefix=3
+
+            - id: notification-service
+              uri: ${NOTIFICATION_SERVICE_URI}
+              predicates:
+                - Path=/api/v1/notification/**
+              filters:
+                - StripPrefix=3
+            - id: notification-service-ws
+              uri: ${NOTIFICATION_WS_SERVICE_URI}
+              predicates:
+                - Path=/ws/notifications/**

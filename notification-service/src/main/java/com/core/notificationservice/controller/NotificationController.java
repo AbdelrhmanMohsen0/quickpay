@@ -1,6 +1,8 @@
 package com.core.notificationservice.controller;
 
-import java.util.List;import java.util.UUID;import com.core.notificationservice.domain.NotificationStatus;import com.core.notificationservice.model.Notification;import com.core.notificationservice.service.NotificationService;import lombok.RequiredArgsConstructor;import org.springframework.web.bind.annotation.GetMapping;import org.springframework.web.bind.annotation.RequestMapping;import org.springframework.web.bind.annotation.RequestParam;import org.springframework.web.bind.annotation.RestController;
+import java.util.List;import java.util.UUID;import com.core.notificationservice.domain.NotificationStatus;import com.core.notificationservice.model.Notification;import com.core.notificationservice.service.NotificationService;import lombok.RequiredArgsConstructor;import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;import org.springframework.web.bind.annotation.RequestParam;import org.springframework.web.bind.annotation.RestController;
 
 
 @RequiredArgsConstructor
@@ -16,23 +18,23 @@ public class NotificationController {
 		System.out.println("Notification Service is working!");
 	}
 	
-	@GetMapping("/")
+	@GetMapping("/notifications")
 	public List<Notification> findAll(){
 		return notificationService.findAll();
 	}
 	
-	@GetMapping("/")
+	@GetMapping("/notification")
 	public Notification findById(@RequestParam UUID id){
 		return notificationService.findById(id);
 	}
 	
 	@GetMapping("/")
-	public List<Notification> findAllByReceiverId(@RequestParam UUID receiverId){
+	public List<Notification> findAllByReceiverId(@RequestHeader("X-User-Id") UUID receiverId){
 		return notificationService.findAllByReceiverId(receiverId);
 	}
 	
 	@GetMapping("/unread")
-	public List<Notification> findAllByStatus(@RequestParam UUID receiverId, @RequestParam NotificationStatus status){
+	public List<Notification> findAllByStatus(@RequestHeader("X-User-Id") UUID receiverId, @RequestParam NotificationStatus status){
 		return notificationService.findAllByUserIdAndStatus(receiverId, status);
 	}
 	

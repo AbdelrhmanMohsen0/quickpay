@@ -19,8 +19,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Builder
 @NoArgsConstructor
@@ -34,12 +35,6 @@ public class Notification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
-	
-	@NotNull
-	private UUID senderId;
-	
-	@NotNull
-	private String senderName;
 	
 	@NotNull
 	private UUID receiverId;
@@ -70,6 +65,7 @@ public class Notification {
 	@Builder.Default
 	private NotificationStatus status = NotificationStatus.UNREAD;
 	
+	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(columnDefinition = "TEXT")
 	private String metadata;
 	

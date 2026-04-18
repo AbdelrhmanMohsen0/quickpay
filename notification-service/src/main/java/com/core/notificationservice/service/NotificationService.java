@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 public class NotificationService {
 	
 	// todo: check idempotencyKey for duplicate notifications
-	// todo: add websockets
 	
 	private final NotificationRepo notificationRepo;
 
