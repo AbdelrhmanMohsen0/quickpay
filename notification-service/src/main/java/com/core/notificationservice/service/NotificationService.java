@@ -28,11 +28,19 @@ public class NotificationService {
 		return notificationRepo.findAllByReceiverId(receiverId);
 	}
 	
-	public List<Notification> findAllByUserIdAndStatus(UUID receiverId, NotificationStatus status) {
-		return notificationRepo.findAllByReceiverIdAndStatus(receiverId, status);
+	public List<Notification> findAllByUserIdAndStatus(UUID receiverId) {
+		return notificationRepo.findAllByReceiverIdAndStatusEquals(receiverId, NotificationStatus.UNREAD);
 	}
 	
-	public Notification save(Notification notification) {
-		return notificationRepo.save(notification);
+	public void markAsRead(UUID id) {
+		Notification notification = notificationRepo.findById(id).orElseThrow(()
+				-> new RuntimeException("Notification not found"));
+		notification.setStatus(NotificationStatus.READ);
+		notificationRepo.save(notification);
+	}
+	
+	
+	public void save(Notification notification) {
+		notificationRepo.save(notification);
 	}
 }
