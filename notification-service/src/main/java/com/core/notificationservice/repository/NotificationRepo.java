@@ -13,5 +13,5 @@ public interface NotificationRepo extends JpaRepository<Notification, UUID> {
 
 	List<Notification> findAllByReceiverId(UUID receiverId);
 	
-	List<Notification> findAllByReceiverIdAndStatus(UUID receiverId, NotificationStatus status);
+	List<Notification> findAllByReceiverIdAndStatusEquals(UUID receiverId, NotificationStatus status);
 }

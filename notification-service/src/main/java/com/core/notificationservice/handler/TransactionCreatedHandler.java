@@ -2,7 +2,6 @@ package com.core.notificationservice.handler;
 
 import java.util.List;
 import java.util.Map;
-import com.core.notificationservice.config.AppProperties;
 import com.core.notificationservice.domain.NotificationStatus;
 import com.core.notificationservice.domain.NotificationType;
 import com.core.notificationservice.domain.TransactionStatus;
@@ -19,7 +18,6 @@ public class TransactionCreatedHandler {
 	
 	//todo: fix the logic of the notification building and check who will receive what and how
 	private final NotificationTemplateService templateService;
-	private final AppProperties appProperties;
 	
 	
 	public List<Notification> handle(TransactionCreatedEvent event) {
@@ -35,14 +33,12 @@ public class TransactionCreatedHandler {
 			);
 			
 			Notification failedNotification = Notification.builder()
-					.senderId(appProperties.getSystemUserId())
 					.type(NotificationType.PAYMENT_FAILED)
 					.title(template.getTitle())
 					.message(template.getShortMessage())
 					.receiverId(event.getSenderId())
 					.shortMessage(template.getShortMessage())
 					.status(NotificationStatus.UNREAD)
-					.senderName(appProperties.getSystemUserName())
 					.receiverName(event.getSenderName())
 					.build();
 			return List.of(failedNotification);
@@ -53,7 +49,8 @@ public class TransactionCreatedHandler {
 				NotificationTemplateType.TRANSACTION_SENT,
 				Map.of(
 						"amount", event.getAmount().toString(),
-						"receiverName", event.getReceiverName()
+						"receiverName", event.getReceiverName(),
+						"transactionId", event.getTransactionId().toString()
 				)
 		);
 		
@@ -61,32 +58,33 @@ public class TransactionCreatedHandler {
 				NotificationTemplateType.TRANSACTION_RECEIVED,
 				Map.of(
 						"amount", event.getAmount().toString(),
-						"senderName", event.getSenderName()
+						"senderName", event.getSenderName(),
+						"transactionId", event.getTransactionId().toString()
 				)
 		);
 		
 		Notification senderNotification = Notification.builder()
-				.senderId(event.getSenderId())
 				.type(NotificationType.TRANSACTION_SENT)
 				.title(senderTemplate.getTitle())
 				.message(senderTemplate.getLongMessage())
 				.receiverId(event.getSenderId())
 				.shortMessage(senderTemplate.getShortMessage())
 				.status(NotificationStatus.UNREAD)
-				.senderName(event.getSenderName())
 				.receiverName(event.getReceiverName())
+				.metadata(Map.of("amount", event.getAmount(),
+						"transactionId", event.getTransactionId()).toString())
 				.build();
 		
 		Notification receiverNotification = Notification.builder()
-				.senderId(event.getSenderId())
 				.type(NotificationType.TRANSACTION_RECEIVED)
 				.title(receiverTemplate.getTitle())
 				.message(receiverTemplate.getLongMessage())
 				.receiverId(event.getReceiverId())
 				.shortMessage(receiverTemplate.getShortMessage())
 				.status(NotificationStatus.UNREAD)
-				.senderName(event.getSenderName())
 				.receiverName(event.getReceiverName())
+				.metadata(Map.of("amount", event.getAmount(),
+						"transactionId", event.getTransactionId()).toString())
 				.build();
 		
 		return List.of(senderNotification, receiverNotification);
