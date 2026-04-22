@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Wallet, Phone, Lock, Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { isAxiosError } from "axios";
 
 import { useAuth } from "@/app/hooks/useAuth";
 import {
@@ -62,8 +64,19 @@ export function AuthPage() {
   const onLoginSubmit = async (data: LoginFormData) => {
     try {
       await login({ phoneNumber: data.phone, password: data.password });
+      navigate("/", { replace: true });
     } catch (error) {
-      navigate("/500");
+      if (isAxiosError(error)) {
+        if (error.response?.status === 500) {
+          navigate("/500");
+        } else if (error.response?.data?.message) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
       console.error("Login failed:", error);
     }
   };
@@ -76,8 +89,23 @@ export function AuthPage() {
         phoneNumber: data.phone,
         password: data.password,
       });
+      navigate("/", { replace: true });
     } catch (error) {
-      navigate("/500");
+      if (isAxiosError(error)) {
+        if (error.response?.status === 500) {
+          navigate("/500");
+        } else if (error.response?.data?.errors) {
+          const errors = error.response.data.errors as { field: string; message: string }[];
+          const firstError = errors?.[0]?.message;
+          toast.error(firstError || "An unexpected error occurred.");
+        } else if (error.response?.data?.message) { 
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
       console.error("Signup failed:", error);
     }
   };

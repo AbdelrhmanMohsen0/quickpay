@@ -3,11 +3,11 @@ import { ProtectedRoute } from "@/app/providers/ProtectedRoute";
 
 // Auth
 import { AuthPage } from "@/pages/auth/AuthPage";
-import App from "./App";
 
 // Errors
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { ServerErrorPage } from "@/pages/errors/ServerErrorPage";
+import App from "./App";
 
 export const router = createBrowserRouter([
   {

@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }: Props) => {
   const login = async (data: LoginInput) => {
     const res = await api.post("/auth/login", data);
 
-    const token = res.data;
+    const token = res.data?.token;
 
     localStorage.setItem("access_token", token);
     setUser(extractUserFromToken(token));
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }: Props) => {
   const signup = async (data: SignupInput) => {
     const res = await api.post("/auth/signup", data);
 
-    const token = res.data;
+    const token = res.data?.token;
 
     localStorage.setItem("access_token", token);
     setUser(extractUserFromToken(token));

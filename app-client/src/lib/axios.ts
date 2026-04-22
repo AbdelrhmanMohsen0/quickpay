@@ -4,7 +4,7 @@ import axios from "axios";
 // Axios Instance
 // ================================
 const api = axios.create({
-  baseURL: import.meta.env.APP_API_BASE_URL,
+  baseURL: import.meta.env.VITE_APP_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -38,12 +38,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // If unauthorized → logout user
     if (error.response?.status === 401) {
       removeAccessToken();
+      const isLoginRequest = error.config.url?.includes("/auth");
 
-      // Redirect to login
-      window.location.href = "/auth";
+      if (!isLoginRequest) {
+        window.location.href = "/auth";
+      }
     }
 
     return Promise.reject(error);
