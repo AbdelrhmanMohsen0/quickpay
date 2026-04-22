@@ -17,4 +17,9 @@ public class KafkaTopicConfig {
     public NewTopic walletTransactionProcessedTopic(){
         return  TopicBuilder.name("wallet.transaction.processed").build();
     }
+
+    @Bean
+    public NewTopic transactionNotificationTopic(){
+        return  TopicBuilder.name("transaction.notification").build();
+    }
 }

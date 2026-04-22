@@ -1,3 +1,7 @@
+app:
+  cors:
+    allowed-origins: "http://localhost:5173"
+
 spring:
   application:
     name: api-gateway
@@ -19,3 +23,28 @@ spring:
                 - Path=/api/v1/users/**
               filters:
                 - StripPrefix=3
+
+            - id: transaction-service
+              uri: ${TRANSACTION_SERVICE_URI}
+              predicates:
+                - Path=/api/v1/transaction/**
+              filters:
+                - StripPrefix=3
+
+            - id: wallet-service
+              uri: ${WALLET_SERVICE_URI}
+              predicates:
+                - Path=/api/v1/wallet/**
+              filters:
+                - StripPrefix=3
+
+            - id: notification-service
+              uri: ${NOTIFICATION_SERVICE_URI}
+              predicates:
+                - Path=/api/v1/notification/**
+              filters:
+                - StripPrefix=3
+            - id: notification-service-ws
+              uri: ${NOTIFICATION_WS_SERVICE_URI}
+              predicates:
+                - Path=/ws/notifications/**

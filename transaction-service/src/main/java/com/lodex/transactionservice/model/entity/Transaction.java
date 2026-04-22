@@ -31,4 +31,6 @@ public class Transaction {
 
     @Column(unique = true, nullable = false)
     private String idempotencyKey;
+
+    private String rejectionReason;
 }
