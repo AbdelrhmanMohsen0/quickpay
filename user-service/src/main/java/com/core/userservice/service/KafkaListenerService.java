@@ -32,13 +32,4 @@ public class KafkaListenerService {
                 .status(UserStatus.ACTIVE)
                 .build());
     }
-
-    @KafkaListener(
-            topics = "user.updated",
-            groupId = "groupId"
-    )
-    public void testListener(String data) {
-        UserDTO createdUser = objectMapper.readValue(data, UserDTO.class);
-        System.out.println(createdUser.firstName() +  " " + createdUser.lastName() + createdUser.status());
-    }
 }

@@ -144,13 +144,11 @@ services:
     container_name: notification-service
     depends_on:
       - notification-db
-    ports:
-      - "8084:8084"
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:5432/notification_db
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      SERVER_PORT: 8084
+      SERVER_PORT: 8080
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   api-gateway:
@@ -170,6 +168,7 @@ services:
       USER_SERVICE_URI: http://user-service:8080
       TRANSACTION_SERVICE_URI: http://transaction-service:8080
       WALLET_SERVICE_URI: http://wallet-service:8080
+      NOTIFICATION_SERVICE_URI: http://notification-service:8080
 volumes:
   auth_data:
   user_data:
