@@ -2,8 +2,12 @@ import { createBrowserRouter } from "react-router-dom";
 import { ProtectedRoute } from "@/app/providers/ProtectedRoute";
 
 // Auth
-import { AuthPage } from "@/features/auth/AuthPage";
+import { AuthPage } from "@/pages/auth/AuthPage";
 import App from "./App";
+
+// Errors
+import { NotFoundPage } from "@/pages/errors/NotFoundPage";
+import { ServerErrorPage } from "@/pages/errors/ServerErrorPage";
 
 export const router = createBrowserRouter([
   {
@@ -28,4 +32,8 @@ export const router = createBrowserRouter([
 
   // Public routes
   { path: "/auth", element: <AuthPage /> },
+
+  // Error routes
+  { path: "/500", element: <ServerErrorPage /> },
+  { path: "*", element: <NotFoundPage /> },
 ]);
