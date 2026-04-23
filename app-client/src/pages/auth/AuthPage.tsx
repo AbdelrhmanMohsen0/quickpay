@@ -30,14 +30,31 @@ import {
   InputGroupInput,
   InputGroupButton,
 } from "@/components/ui/input-group";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+
+function handleAxiosError(error: unknown, navigate: (path: string) => void) {
+  if (isAxiosError(error)) {
+    if (error.response?.status === 500) {
+      navigate("/500");
+    } else if (error.response?.data?.errors) {
+      const errors = error.response.data.errors as { field: string; message: string }[];
+      const firstError = errors?.[0]?.message;
+      toast.error(firstError || "An unexpected error occurred.");
+    } else if (error.response?.data?.message) {
+      toast.error(error.response.data.message);
+    } else {
+      toast.error("An unexpected error occurred.");
+    }
+  } else {
+    toast.error("An unexpected error occurred.");
+  }
+}
 
 export function AuthPage() {
-  const { login, signup } = useAuth();
+  const { login, signup, user, loading } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const togglePassword = () => setShowPassword(!showPassword);
   const toggleConfirmPassword = () =>
     setShowConfirmPassword(!showConfirmPassword);
@@ -66,17 +83,7 @@ export function AuthPage() {
       await login({ phoneNumber: data.phone, password: data.password });
       navigate("/", { replace: true });
     } catch (error) {
-      if (isAxiosError(error)) {
-        if (error.response?.status === 500) {
-          navigate("/500");
-        } else if (error.response?.data?.message) {
-          toast.error(error.response.data.message);
-        } else {
-          toast.error("An unexpected error occurred.");
-        }
-      } else {
-        toast.error("An unexpected error occurred.");
-      }
+      handleAxiosError(error, navigate);
       console.error("Login failed:", error);
     }
   };
@@ -91,24 +98,18 @@ export function AuthPage() {
       });
       navigate("/", { replace: true });
     } catch (error) {
-      if (isAxiosError(error)) {
-        if (error.response?.status === 500) {
-          navigate("/500");
-        } else if (error.response?.data?.errors) {
-          const errors = error.response.data.errors as { field: string; message: string }[];
-          const firstError = errors?.[0]?.message;
-          toast.error(firstError || "An unexpected error occurred.");
-        } else if (error.response?.data?.message) { 
-          toast.error(error.response.data.message);
-        } else {
-          toast.error("An unexpected error occurred.");
-        }
-      } else {
-        toast.error("An unexpected error occurred.");
-      }
+      handleAxiosError(error, navigate);
       console.error("Signup failed:", error);
     }
   };
+
+  if (loading) {
+    return null;
+  }
+
+  if (user && user.status === "ACTIVE") {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">

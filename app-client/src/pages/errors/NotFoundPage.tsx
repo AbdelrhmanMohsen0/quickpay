@@ -5,7 +5,7 @@ export function NotFoundPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background text-foreground p-4 text-center">
       <h1 className="text-8xl md:text-9xl font-extrabold tracking-widest text-primary/20">404</h1>
-      <div className="bg-primary px-3 py-1 text-primary-foreground text-sm font-semibold rounded absolute shadow-lg">
+      <div className="bg-primary px-3 py-1 text-primary-foreground text-sm font-semibold rounded shadow-lg">
         Page Not Found
       </div>
       <p className="mt-8 text-xl text-muted-foreground max-w-md">

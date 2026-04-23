@@ -7,6 +7,7 @@ export const ProtectedRoute = () => {
   if (loading) return <div>Loading...</div>;
 
   if (!user) return <Navigate to="/auth" replace />;
+  if (user.status === "SUSPENDED") return <Navigate to="/suspended" replace />;
 
-  return <Outlet />;
+  return <Outlet />; 
 };
