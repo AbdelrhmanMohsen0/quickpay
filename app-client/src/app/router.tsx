@@ -5,6 +5,8 @@ import { AuthPage } from "@/pages/auth/AuthPage";
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { ServerErrorPage } from "@/pages/errors/ServerErrorPage";
 import { AccountSuspendedPage } from "@/pages/errors/AccountSuspendedPage";
+import { TransferPage } from "@/pages/transfer/TransferPage";
+import { TransferSuccessPage } from "@/pages/transfer/TransferSuccessPage";
 import App from "./App";
 
 export const router = createBrowserRouter([
@@ -20,7 +22,8 @@ export const router = createBrowserRouter([
         ),
         children: [
           { index: true, element: <App /> },
-        //   { path: "transfer", element: <TransferPage /> },
+          { path: "transfer", element: <TransferPage /> },
+          { path: "transfer/success", element: <TransferSuccessPage /> },
         //   { path: "history", element: <HistoryPage /> },
         //   { path: "notifications", element: <NotificationsPage /> },
 

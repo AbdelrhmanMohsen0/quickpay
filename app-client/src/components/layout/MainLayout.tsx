@@ -64,7 +64,7 @@ export function MainLayout({ children }: MainLayoutProps) {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 z-50 w-full border-t pb-2 sm:pb-4 md:max-w-md">
+      <nav className="fixed bottom-0 z-50 w-full border-t pb-2 sm:pb-4 md:max-w-md backdrop-blur-md">
         <div className="flex items-center justify-around px-2 py-2">
           {navItems.map((item) => {
             const isActive =
