@@ -1,11 +1,7 @@
 import { createBrowserRouter, Outlet } from "react-router-dom";
 import { ProtectedRoute } from "@/app/providers/ProtectedRoute";
 import { MainLayout } from "@/components/layout/MainLayout";
-
-// Auth
 import { AuthPage } from "@/pages/auth/AuthPage";
-
-// Errors
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { ServerErrorPage } from "@/pages/errors/ServerErrorPage";
 import { AccountSuspendedPage } from "@/pages/errors/AccountSuspendedPage";

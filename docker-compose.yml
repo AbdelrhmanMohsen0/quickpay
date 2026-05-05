@@ -159,6 +159,7 @@ services:
       - user-service
       - transaction-service
       - wallet-service
+      - notification-service
     ports:
       - "8080:8080"
     environment:
