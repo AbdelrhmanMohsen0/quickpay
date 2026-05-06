@@ -1,6 +1,8 @@
 package com.lodex.transactionservice.service;
 
+import com.lodex.transactionservice.cache.TransactionFeesCache;
 import com.lodex.transactionservice.dao.UserDAO;
+import com.lodex.transactionservice.model.dto.FeeConfigDTO;
 import com.lodex.transactionservice.model.dto.NotificationDTO;
 import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.model.entity.User;
@@ -17,6 +19,7 @@ public class KafkaConsumerService {
     private final TransactionService transactionService;
     private final NotificationService notificationService;
     private final KafkaProducerService kafkaProducerService;
+    private final TransactionFeesCache feesCache;
     private final UserDAO userDAO;
     private final String groupId = "transaction-group";
 
@@ -39,6 +42,12 @@ public class KafkaConsumerService {
         User user = objectMapper.readValue(userStr, User.class);
         User saveUser = userDAO.save(user);
         System.out.println("UPDATED USER ID: " + saveUser.getId());
+    }
+
+    @KafkaListener(topics = "fee.config.updated", groupId = groupId)
+    public void onFeeConfigUpdate(FeeConfigDTO feeConfig) {
+        feesCache.updateConfig(feeConfig);
+        System.out.println("UPDATED FEE: " + feeConfig.getFixedFee());
     }
 
 }

@@ -2,6 +2,8 @@ package com.lodex.transactionservice.dao;
 
 import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.model.entity.TransactionStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,5 +19,14 @@ public interface TransactionDAO extends JpaRepository<Transaction, Integer> {
     List<Transaction> findUserTransactionsByStatus(
             @Param("userId") String userId,
             @Param("status") TransactionStatus status
-    );    Transaction findById(UUID id);
+    );
+
+    @Query("SELECT t FROM Transaction t WHERE (t.senderId = :userId OR t.receiverId = :userId) AND t.status = :status")
+    Page<Transaction> findUserTransactionsByStatus(
+            @Param("userId") String userId,
+            @Param("status") TransactionStatus status,
+            Pageable pageable
+    );
+
+    Transaction findById(UUID id);
 }
