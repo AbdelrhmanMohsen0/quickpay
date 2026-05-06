@@ -1,5 +1,9 @@
 package com.lodex.transactionservice.service;
-
+import com.lodex.transactionservice.model.dto.TransactionFeesResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import com.lodex.transactionservice.cache.TransactionFeesCache;
 import com.lodex.transactionservice.dao.TransactionDAO;
 import com.lodex.transactionservice.dao.UserDAO;
@@ -28,12 +32,16 @@ public class TransactionService {
     private final KafkaProducerService kafkaProducerService;
     private final TransactionFeesCache transactionFeesCache;
 
-    public List<TransactionsResponseDTO> getTransactionsByUserId(String userId) {
-        List<Transaction> transactions = transactionDAO.findUserTransactionsByStatus(userId, TransactionStatus.SUCCESS);
-        List<TransactionsResponseDTO> dto = transactionMapper.toTransactionsResponseDTO(transactions, userId);
-        System.out.println("getTransactionsByUserId: " + transactions);
+    public Page<TransactionsResponseDTO> getTransactionsByUserId(String userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
 
-        return dto;
+        Page<Transaction> transactions =
+                transactionDAO.findUserTransactionsByStatus(userId, TransactionStatus.SUCCESS, pageable);
+
+        System.out.println("getTransactionsByUserId: " + transactions.getContent());
+
+        return transactions.map(transaction ->
+                transactionMapper.toTransactionsResponseDTO(transaction, userId));
     }
 
     public Transaction createTransaction(TransferRequestDTO dto, String idempotencyKey) {
@@ -97,5 +105,12 @@ public class TransactionService {
         existingTransaction.setRejectionReason(processedTransaction.getRejectionReason());
 
         return transactionDAO.save(existingTransaction);
+    }
+
+    public TransactionFeesResponseDTO getTransactionFees() {
+        return new TransactionFeesResponseDTO(
+                transactionFeesCache.getFixedFee(),
+                transactionFeesCache.getPercentageFee()
+        );
     }
 }
