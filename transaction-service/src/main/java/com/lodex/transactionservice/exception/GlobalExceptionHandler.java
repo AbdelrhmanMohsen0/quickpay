@@ -40,4 +40,11 @@ public class GlobalExceptionHandler {
                 .body(Map.of("message", ex.getMessage()));
     }
 
+    // Handles  (409 Conflict)
+    @ExceptionHandler(MaxTransferAmountExceeded.class)
+    public ResponseEntity<Map<String, String>> handleMaxTransferAmountExceeded(MaxTransferAmountExceeded ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("message", ex.getMessage()));
+    }
+
 }
