@@ -31,3 +31,16 @@ export const signupSchema = z
   });
 
 export type SignupFormData = z.infer<typeof signupSchema>;
+
+export const transferSchema = z.object({
+  phone: z
+    .string()
+    .length(11, "Phone must be 11 digits")
+    .regex(/^01[0-9]{9}$/, "Invalid Egyptian phone number"),
+  amount: z
+    .number()
+    .positive("Amount must be greater than 0")
+    .min(1, "Minimum transfer amount is 1 EGP"),
+});
+
+export type TransferFormData = z.infer<typeof transferSchema>;

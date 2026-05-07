@@ -1,6 +1,6 @@
 app:
   cors:
-    allowed-origins: "http://localhost:5173"
+    allowed-origins: "http://localhost:5173, http://192.168.100.14:5173"
 
 spring:
   application:
