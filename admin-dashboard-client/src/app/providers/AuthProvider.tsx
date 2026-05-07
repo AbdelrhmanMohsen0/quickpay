@@ -6,6 +6,7 @@ import {
 } from "./AuthContext.tsx";
 import api from "@/lib/axios.ts";
 import { jwtDecode } from "jwt-decode";
+import { NotAdminError } from "@/lib/errors";
 
 type Props = {
   children: React.ReactNode;
@@ -93,6 +94,12 @@ export const AuthProvider = ({ children }: Props) => {
   const login = async (data: LoginInput) => {
     const res = await api.post("/auth/login", data);
     const token = res.data?.token;
+
+    // Guard: only admin users may access this dashboard
+    const decoded = jwtDecode<JwtPayload>(token);
+    if (decoded.roles !== "ROLE_ADMIN") {
+      throw new NotAdminError();
+    }
 
     localStorage.setItem("access_token", token);
     

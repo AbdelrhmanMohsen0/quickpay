@@ -1,4 +1,10 @@
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+
+type JwtPayload = {
+  exp: number;
+  role?: string;
+};
 
 // ================================
 // Axios Instance
@@ -25,6 +31,13 @@ api.interceptors.request.use(
 
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+
+      try {
+        const { role } = jwtDecode<JwtPayload>(token);
+        if (role) config.headers["X-User-Role"] = "admin";
+      } catch {
+        // malformed token — let the request go without the role header
+      }
     }
 
     return config;
@@ -43,7 +56,7 @@ api.interceptors.response.use(
       const isLoginRequest = error.config.url?.includes("/auth");
 
       if (!isLoginRequest) {
-        window.location.href = "/auth";
+        window.location.href = "/admin/auth";
       }
     }
 

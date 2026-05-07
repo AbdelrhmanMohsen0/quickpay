@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Wallet, Phone, Lock, Eye, EyeOff } from "lucide-react";
+import { Wallet, Phone, Lock, Eye, EyeOff, ShieldX, ArrowLeft } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { isAxiosError } from "axios";
+import { NotAdminError } from "@/lib/errors";
 
 import { useAuth } from "@/app/hooks/useAuth";
 import {
@@ -51,6 +52,7 @@ export function AuthPage() {
   const { login, user, loading } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [accessDenied, setAccessDenied] = useState(false);
   const togglePassword = () => setShowPassword(!showPassword);
 
   const loginForm = useForm<LoginFormData>({
@@ -66,17 +68,46 @@ export function AuthPage() {
       await login({ phoneNumber: data.phone, password: data.password });
       navigate("/admin/", { replace: true });
     } catch (error) {
+      if (error instanceof NotAdminError) {
+        setAccessDenied(true);
+        return;
+      }
       handleAxiosError(error, navigate);
       console.error("Login failed:", error);
     }
   };
 
-  if (loading) {
-    return null;
-  }
+  if (loading) return null;
+  if (user && user.status === "ACTIVE") return <Navigate to="/admin/" replace />;
 
-  if (user && user.status === "ACTIVE") {
-    return <Navigate to="/admin/" replace />;
+  // Access denied screen
+  if (accessDenied) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
+        <Card className="w-full max-w-md px-3 py-10 shadow-lg text-center">
+          <CardContent className="flex flex-col items-center gap-6 pt-6">
+            <div className="flex size-16 items-center justify-center rounded-2xl bg-destructive/10">
+              <ShieldX className="size-8 text-destructive" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-xl font-bold tracking-tight">Access Denied</h2>
+              <p className="text-sm text-muted-foreground">
+                This dashboard is restricted to admin accounts only.
+                Your account does not have the required permissions.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => setAccessDenied(false)}
+            >
+              <ArrowLeft data-icon="inline-start" />
+              Back to Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (

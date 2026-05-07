@@ -1,8 +1,12 @@
-import { useState, useEffect } from "react";
-import { Save, ArrowRightLeft, Coins } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Save, ArrowRightLeft, Coins, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLayoutContext } from "@/app/providers/LayoutContext";
+import { getSystemConfig, updateSystemConfig } from "@/services/configService";
+import type { SystemConfig } from "@/types/types";
+
+type Status = "idle" | "loading" | "saving" | "success" | "error";
 
 export function SystemConfigurationPage() {
   const { setSearchPlaceholder } = useLayoutContext();
@@ -12,35 +16,87 @@ export function SystemConfigurationPage() {
     return () => setSearchPlaceholder("Search across architecture...");
   }, [setSearchPlaceholder]);
 
-  // Transaction Limits
-  const [minTransfer, setMinTransfer] = useState("5.00");
-  const [maxTransfer, setMaxTransfer] = useState("10000.00");
+  // Server snapshot — used by "Discard" to reset
+  const serverSnapshot = useRef<SystemConfig | null>(null);
 
-  // Revenue Architecture
-  const [fixedFee, setFixedFee] = useState("0.50");
-  const [percentageFee, setPercentageFee] = useState("1.25");
+  // Form fields
+  const [minTransfer, setMinTransfer] = useState("");
+  const [maxTransfer, setMaxTransfer] = useState("");
+  const [fixedFee, setFixedFee] = useState("");
+  const [percentageFee, setPercentageFee] = useState("");
 
-  // Save/dirty state
-  const [saved, setSaved] = useState(true);
+  const [dirty, setDirty] = useState(false);
+  const [status, setStatus] = useState<Status>("loading");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // ── Fetch on mount ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+    setStatus("loading");
+
+    getSystemConfig()
+      .then((config) => {
+        if (cancelled) return;
+        serverSnapshot.current = config;
+        applyConfig(config);
+        setStatus("idle");
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setErrorMsg("Failed to load configuration from server.");
+        setStatus("error");
+      });
+
+    return () => { cancelled = true; };
+  }, []);
+
+  function applyConfig(config: SystemConfig) {
+    setMinTransfer(String(config.minTransferAmount));
+    setMaxTransfer(String(config.maxTransferAmount));
+    setFixedFee(String(config.fixedFee));
+    setPercentageFee(String(config.percentageFee));
+    setDirty(false);
+  }
+
+  // ── Handlers ────────────────────────────────────────────────────────────────
   const handleChange = (setter: (v: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setter(e.target.value);
-    setSaved(false);
+    setDirty(true);
+    if (status === "success" || status === "error") setStatus("idle");
   };
 
-  const handleSave = () => setSaved(true);
   const handleDiscard = () => {
-    setMinTransfer("5.00");
-    setMaxTransfer("10000.00");
-    setFixedFee("0.50");
-    setPercentageFee("1.25");
-    setSaved(true);
+    if (serverSnapshot.current) applyConfig(serverSnapshot.current);
   };
 
-  // Live simulation: fee on EGP 100
+  const handleSave = async () => {
+    setStatus("saving");
+    setErrorMsg(null);
+    const payload: SystemConfig = {
+      minTransferAmount: parseFloat(minTransfer) || 0,
+      maxTransferAmount: parseFloat(maxTransfer) || 0,
+      fixedFee: parseFloat(fixedFee) || 0,
+      percentageFee: parseFloat(percentageFee) || 0,
+    };
+
+    try {
+      const updated = await updateSystemConfig(payload);
+      serverSnapshot.current = updated;
+      applyConfig(updated);
+      setStatus("success");
+    } catch (err: any) {
+      setErrorMsg(err.response?.data?.message ?? "Failed to save configuration.");
+      setStatus("error");
+    }
+  };
+
+  // ── Live simulation ─────────────────────────────────────────────────────────
   const fixed = parseFloat(fixedFee) || 0;
   const pct = parseFloat(percentageFee) || 0;
   const simulatedTotal = (fixed + (pct / 100) * 100).toFixed(2);
+
+  const isLoading = status === "loading";
+  const isSaving = status === "saving";
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -51,6 +107,14 @@ export function SystemConfigurationPage() {
           Manage global financial protocols and architecture limits parameters for the QuickPay system.
         </p>
       </div>
+
+      {/* Fetch error banner */}
+      {status === "error" && !isSaving && (
+        <div className="flex items-center gap-2 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <AlertCircle className="size-4 shrink-0" />
+          {errorMsg}
+        </div>
+      )}
 
       {/* Transaction Limits */}
       <Card className="shadow-sm">
@@ -79,7 +143,8 @@ export function SystemConfigurationPage() {
                   step="0.01"
                   value={minTransfer}
                   onChange={handleChange(setMinTransfer)}
-                  className="flex-1 bg-transparent text-sm font-semibold focus:outline-none"
+                  disabled={isLoading || isSaving}
+                  className="flex-1 bg-transparent text-sm font-semibold focus:outline-none disabled:opacity-50"
                 />
               </div>
             </div>
@@ -95,7 +160,8 @@ export function SystemConfigurationPage() {
                   step="0.01"
                   value={maxTransfer}
                   onChange={handleChange(setMaxTransfer)}
-                  className="flex-1 bg-transparent text-sm font-semibold focus:outline-none"
+                  disabled={isLoading || isSaving}
+                  className="flex-1 bg-transparent text-sm font-semibold focus:outline-none disabled:opacity-50"
                 />
               </div>
             </div>
@@ -130,7 +196,8 @@ export function SystemConfigurationPage() {
                   step="0.01"
                   value={fixedFee}
                   onChange={handleChange(setFixedFee)}
-                  className="w-full bg-transparent text-sm font-semibold focus:outline-none"
+                  disabled={isLoading || isSaving}
+                  className="w-full bg-transparent text-sm font-semibold focus:outline-none disabled:opacity-50"
                 />
               </div>
             </div>
@@ -149,7 +216,8 @@ export function SystemConfigurationPage() {
                   step="0.01"
                   value={percentageFee}
                   onChange={handleChange(setPercentageFee)}
-                  className="w-full bg-transparent text-sm font-semibold focus:outline-none"
+                  disabled={isLoading || isSaving}
+                  className="w-full bg-transparent text-sm font-semibold focus:outline-none disabled:opacity-50"
                 />
               </div>
             </div>
@@ -162,7 +230,7 @@ export function SystemConfigurationPage() {
               <div className="rounded-md border border-primary/20 bg-primary/5 px-4 py-3 min-h-[46px] flex items-center">
                 <p className="text-sm text-muted-foreground leading-snug">
                   On EGP 100 transfer, user pays{" "}
-                  <span className="font-bold text-primary">${simulatedTotal}</span> in total fees.
+                  <span className="font-bold text-primary">EGP {simulatedTotal}</span> in total fees.
                 </p>
               </div>
             </div>
@@ -172,12 +240,27 @@ export function SystemConfigurationPage() {
 
       {/* Action Buttons */}
       <div className="flex items-center justify-end gap-3 pt-2">
-        <Button variant="outline" onClick={handleDiscard} disabled={saved}>
+        {/* Inline feedback */}
+        {status === "success" && (
+          <span className="flex items-center gap-1.5 text-sm text-emerald-600 dark:text-emerald-400">
+            <CheckCircle2 className="size-4" /> Saved successfully
+          </span>
+        )}
+        {status === "error" && isSaving === false && errorMsg && (
+          <span className="flex items-center gap-1.5 text-sm text-destructive">
+            <AlertCircle className="size-4" /> {errorMsg}
+          </span>
+        )}
+
+        <Button variant="outline" onClick={handleDiscard} disabled={!dirty || isSaving || isLoading}>
           Discard Changes
         </Button>
-        <Button onClick={handleSave} disabled={saved} className="gap-2">
-          <Save className="size-4" />
-          Save Changes
+        <Button onClick={handleSave} disabled={!dirty || isSaving || isLoading} className="gap-2 min-w-[130px]">
+          {isSaving ? (
+            <><Loader2 className="size-4 animate-spin" /> Saving…</>
+          ) : (
+            <><Save className="size-4" /> Save Changes</>
+          )}
         </Button>
       </div>
     </div>

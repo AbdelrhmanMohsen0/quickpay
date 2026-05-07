@@ -1,16 +1,16 @@
 package com.lodex.transactionservice.controller;
-import com.lodex.transactionservice.model.dto.TransactionFeesResponseDTO;
+import com.lodex.transactionservice.model.dto.*;
+import com.lodex.transactionservice.model.entity.UserRole;
 import org.springframework.data.domain.Page;
 import com.lodex.transactionservice.mapper.TransactionMapper;
-import com.lodex.transactionservice.model.dto.TransactionsResponseDTO;
-import com.lodex.transactionservice.model.dto.TransferRequestDTO;
-import com.lodex.transactionservice.model.dto.TransferResponseDTO;
 import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping
@@ -50,5 +50,24 @@ public class TransactionController {
     public ResponseEntity<TransactionFeesResponseDTO> getTransactionFees() {
         TransactionFeesResponseDTO fees = transactionService.getTransactionFees();
         return ResponseEntity.ok(fees);
+    }
+
+    @GetMapping("/fees/config")
+    public ResponseEntity<FeeConfigDTO> getSystemFeeConfig() {
+        FeeConfigDTO config = transactionService.getFullTransactionConfig();
+        return ResponseEntity.ok(config);
+    }
+
+    @PatchMapping("/fees/config")
+    public ResponseEntity<FeeConfigDTO> updateSystemFeeConfig(
+            @Valid @RequestBody FeeConfigDTO configDto,
+            @RequestHeader("X-User-Role") UserRole userRole) {
+
+        if (!userRole.equals(UserRole.ROLE_ADMIN)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin role required to update fees.");
+        }
+
+        FeeConfigDTO updatedConfig = transactionService.updateTransactionConfig(configDto);
+        return ResponseEntity.ok(updatedConfig);
     }
 }

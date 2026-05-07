@@ -1,18 +1,18 @@
 import { Link, useLocation } from "react-router-dom";
-import { LogOut, LayoutDashboard, Users, ArrowRightLeft, Settings, Search, User } from "lucide-react";
+import { LogOut, Users, Settings, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/app/hooks/useAuth";
 import { LayoutProvider, useLayoutContext } from "@/app/providers/LayoutContext";
 
+
+
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const { searchPlaceholder } = useLayoutContext();
 
   const navItems = [
-    { name: "Dashboard", path: "/admin", exact: true, icon: LayoutDashboard },
     { name: "User Management", path: "/admin/users", icon: Users },
-    { name: "Transactions", path: "/admin/transactions", icon: ArrowRightLeft },
     { name: "System Configuration", path: "/admin/settings", icon: Settings },
   ];
 
@@ -67,18 +67,13 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top Header */}
         <header className="flex h-14 items-center justify-between border-b bg-background px-8">
-          <div className="relative w-80">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder={searchPlaceholder}
-              className="h-9 w-full rounded-md border border-input bg-muted/50 pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
-          <div className="flex items-center gap-3">
+          
+          <div className="flex items-center gap-3 ml-auto">
             <div className="text-right">
               <p className="text-sm font-semibold leading-none">Admin User</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Admin 1</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {user ? `${user.firstName} ${user.lastName}` : ""}
+              </p>
             </div>
             <div className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary">
               <User className="size-5" />

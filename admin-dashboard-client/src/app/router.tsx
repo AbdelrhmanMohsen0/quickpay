@@ -1,10 +1,8 @@
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { ProtectedRoute } from "@/app/providers/ProtectedRoute";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { AdminLayout } from "@/components/layout/AdminLayout";
-import { DashboardPage } from "@/pages/admin/DashboardPage";
 import { UserManagementPage } from "@/pages/admin/UserManagementPage";
-import { TransactionsPage } from "@/pages/admin/TransactionsPage";
 import { SystemConfigurationPage } from "@/pages/admin/SystemConfigurationPage";
 import { AuthPage } from "@/pages/auth/AuthPage";
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
@@ -26,9 +24,8 @@ export const router = createBrowserRouter([
           </AdminLayout>
         ),
         children: [
-          { index: true, element: <DashboardPage /> },
+          { index: true, element: <Navigate to="/admin/users" replace /> },
           { path: "users", element: <UserManagementPage /> },
-          { path: "transactions", element: <TransactionsPage /> },
           { path: "settings", element: <SystemConfigurationPage /> },
           // { path: "transfer", element: <TransferPage /> },
           // { path: "transfer/success", element: <TransferSuccessPage /> },
@@ -47,6 +44,9 @@ export const router = createBrowserRouter([
       },
     ],
   },
+
+  // Root redirect
+  { path: "/", element: <Navigate to="/admin/auth" replace /> },
 
   // Public routes
   { path: "/admin/auth", element: <AuthPage /> },

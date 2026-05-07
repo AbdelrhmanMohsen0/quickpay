@@ -1,4 +1,6 @@
 package com.lodex.transactionservice.service;
+import com.lodex.transactionservice.mapper.TransactionConfigMapper;
+import com.lodex.transactionservice.model.dto.FeeConfigDTO;
 import com.lodex.transactionservice.model.dto.TransactionFeesResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -8,7 +10,7 @@ import com.lodex.transactionservice.cache.TransactionFeesCache;
 import com.lodex.transactionservice.dao.TransactionDAO;
 import com.lodex.transactionservice.dao.UserDAO;
 import com.lodex.transactionservice.exception.DuplicateTransactionException;
-import com.lodex.transactionservice.exception.MaxTransferAmountExceeded;
+import com.lodex.transactionservice.exception.TransferAmountViolated;
 import com.lodex.transactionservice.exception.UserNotFoundException;
 import com.lodex.transactionservice.mapper.TransactionMapper;
 import com.lodex.transactionservice.model.dto.TransactionsResponseDTO;
@@ -21,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class TransactionService {
     private final TransactionMapper transactionMapper;
     private final KafkaProducerService kafkaProducerService;
     private final TransactionFeesCache transactionFeesCache;
+    private final TransactionConfigMapper transactionConfigMapper;
 
     public Page<TransactionsResponseDTO> getTransactionsByUserId(String userId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
@@ -55,8 +57,8 @@ public class TransactionService {
         User receiver = userDAO.findByPhoneNumber(dto.getReceiverPhoneNumber());
         if(receiver == null) throw new UserNotFoundException("No user with such phone number");
 
-        // Add fees on the transfer amount
-        BigDecimal totalAmount = calculateFee(dto);
+        // Add fees on the transfer amount and return total
+        BigDecimal totalAmount = calculateTotalAmount(dto);
 
         // Create new pending transaction
         Transaction newTransaction = transactionMapper.toEntity(dto, idempotencyKey);
@@ -73,7 +75,7 @@ public class TransactionService {
         return insertedTransaction;
     }
 
-    private BigDecimal calculateFee(TransferRequestDTO dto) {
+    private BigDecimal calculateTotalAmount(TransferRequestDTO dto) {
         // Take a single atomic snapshot of the fee config
         TransactionFeesCache.Fees fees = transactionFeesCache.getFees();
 
@@ -81,9 +83,16 @@ public class TransactionService {
 
         // Check transfer amount against system limit
         if (amount.compareTo(fees.maxTransferAmount()) > 0) {
-            throw new MaxTransferAmountExceeded(
+            throw new TransferAmountViolated(
                     String.format("Max transfer amount exceeded. Max allowed: %s, attempted: %s",
                             fees.maxTransferAmount(), amount)
+            );
+        }
+
+        if (amount.compareTo(fees.minTransferAmount()) < 0) {
+            throw new TransferAmountViolated(
+                    String.format("Min transfer amount not met. Min allowed: %s, attempted: %s",
+                            fees.minTransferAmount(), amount)
             );
         }
 
@@ -112,5 +121,15 @@ public class TransactionService {
                 transactionFeesCache.getFixedFee(),
                 transactionFeesCache.getPercentageFee()
         );
+    }
+
+    public FeeConfigDTO getFullTransactionConfig() {
+        TransactionFeesCache.Fees currentFees = transactionFeesCache.getFees();
+        return transactionConfigMapper.toDto(currentFees);
+    }
+
+    public FeeConfigDTO updateTransactionConfig(FeeConfigDTO newConfigDTO) {
+        transactionFeesCache.updateConfig(newConfigDTO);
+        return getFullTransactionConfig();
     }
 }
