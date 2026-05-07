@@ -52,6 +52,10 @@ public class UserService {
                 .map(userMapper::toDTO)
                 .toList();
     }
+    
+    public Long countUsers() {
+        return userRepository.count();
+    }
 
     public void saveUser(User user) {
         userRepository.save(user);

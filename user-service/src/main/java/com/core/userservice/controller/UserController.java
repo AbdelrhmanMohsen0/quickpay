@@ -63,4 +63,12 @@ public class UserController {
         }
         return new ResponseEntity<>(userService.getUsersByKeyword(keyword, UserService.USERS_SEARCH_RESULTS_LIMIT), HttpStatus.OK);
     }
+    
+    @GetMapping("/count")
+    public ResponseEntity<Long> getUsersCount( @RequestHeader("X-User-Role") UserRole userRole) {
+        if (!userRole.equals(UserRole.ROLE_ADMIN)) {
+            throw new UserForbiddenException("You are not allowed to perform this operation");
+        }
+        return new ResponseEntity<>(userService.countUsers(), HttpStatus.OK);
+    }
 }
