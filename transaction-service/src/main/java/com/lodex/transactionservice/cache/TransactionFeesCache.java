@@ -1,6 +1,7 @@
 package com.lodex.transactionservice.cache;
 
 import com.lodex.transactionservice.dao.TransactionConfigRepository;
+import com.lodex.transactionservice.mapper.TransactionConfigMapper;
 import com.lodex.transactionservice.model.dto.FeeConfigDTO;
 import com.lodex.transactionservice.model.entity.TransactionConfig;
 import jakarta.annotation.PostConstruct;
@@ -18,18 +19,21 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TransactionFeesCache {
 
     private final TransactionConfigRepository repository;
+    private final TransactionConfigMapper transactionConfigMapper;
 
     public record Fees(
             BigDecimal fixedFee,
             BigDecimal percentageFee,
-            BigDecimal maxTransferAmount
+            BigDecimal maxTransferAmount,
+            BigDecimal minTransferAmount
     ) {}
 
     private final AtomicReference<Fees> fees = new AtomicReference<>(
             new Fees(
                     new BigDecimal("0.50"),
                     new BigDecimal("1.25"),
-                    new BigDecimal("10000.00")
+                    new BigDecimal("10000.00"),
+                    new BigDecimal("5.00")
             )
     );
 
@@ -41,7 +45,8 @@ public class TransactionFeesCache {
                     Fees initialFees = new Fees(
                             dbConfig.getFixedFee(),
                             dbConfig.getPercentageFee(),
-                            dbConfig.getMaxTransferAmount()
+                            dbConfig.getMaxTransferAmount(),
+                            dbConfig.getMinTransferAmount()
                     );
                     fees.set(initialFees);
                     log.info("Loaded fees from database into cache: {}", initialFees);
@@ -59,25 +64,23 @@ public class TransactionFeesCache {
     public void updateConfig(FeeConfigDTO dto) {
         log.info("Received new config update request: {}", dto);
 
-        // Update the Database
+        // Fetch the existing database entity
         TransactionConfig configEntity = repository.findAll().stream().findFirst()
                 .orElse(new TransactionConfig());
 
-        configEntity.setFixedFee(dto.getFixedFee());
-        configEntity.setPercentageFee(dto.getPercentageFee());
-        configEntity.setMaxTransferAmount(dto.getMaxTransferAmount());
-
+        // Update Config Entity
+        transactionConfigMapper.updateEntityFromDto(dto, configEntity);
         repository.save(configEntity);
         log.info("Database updated with new configuration!");
 
-        // Update Cache
+        // Update Cache using the UPDATED ENTITY
         Fees newFees = new Fees(
-                dto.getFixedFee(),
-                dto.getPercentageFee(),
-                dto.getMaxTransferAmount()
+                configEntity.getFixedFee(),
+                configEntity.getPercentageFee(),
+                configEntity.getMaxTransferAmount(),
+                configEntity.getMinTransferAmount()
         );
         fees.set(newFees);
 
         log.info("Local cache updated! {}", newFees);
-    }
-}
+    }}

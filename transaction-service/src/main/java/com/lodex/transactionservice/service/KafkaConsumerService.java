@@ -44,10 +44,4 @@ public class KafkaConsumerService {
         System.out.println("UPDATED USER ID: " + saveUser.getId());
     }
 
-    @KafkaListener(topics = "fee.config.updated", groupId = groupId)
-    public void onFeeConfigUpdate(FeeConfigDTO feeConfig) {
-        feesCache.updateConfig(feeConfig);
-        System.out.println("UPDATED FEE: " + feeConfig.getFixedFee());
-    }
-
 }
