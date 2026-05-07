@@ -19,4 +19,5 @@ public class TransactionConfig {
     private BigDecimal fixedFee;
     private BigDecimal percentageFee;
     private BigDecimal maxTransferAmount;
+    private BigDecimal minTransferAmount;
 }
