@@ -62,7 +62,7 @@ public class TransactionController {
             @Valid @RequestBody FeeConfigDTO configDto,
             @RequestHeader(value = "X-User-Role", required = false) String userRole) {
 
-        if (userRole == null || !userRole.equalsIgnoreCase("admin")) {
+        if (userRole == null || !userRole.equalsIgnoreCase("ROLE_ADMIN")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin role required to update fees.");
         }
 

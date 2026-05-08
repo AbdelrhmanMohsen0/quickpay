@@ -46,9 +46,16 @@ public class GlobalExceptionHandler {
 
     // Handles User Not Found
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUserNotFoundExceptionException(UserNotFoundException ex) {
+    public ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException ex) {
         // Tip: You might want to change this to HttpStatus.NOT_FOUND (404) instead of CONFLICT!
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", ex.getMessage()));
+    }
+
+    // Handles Suspended Users (403 Forbidden)
+    @ExceptionHandler(UserSuspendedException.class)
+    public ResponseEntity<Map<String, String>> handleUserSuspendedException(UserSuspendedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(Map.of("message", ex.getMessage()));
     }
 
