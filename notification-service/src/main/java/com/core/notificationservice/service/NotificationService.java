@@ -1,6 +1,5 @@
 package com.core.notificationservice.service;
 
-import java.util.List;
 import java.util.UUID;
 import com.core.notificationservice.domain.NotificationStatus;
 import com.core.notificationservice.exception.NotificationNotFoundException;
@@ -23,9 +22,9 @@ public class NotificationService {
 		Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 		return notificationRepo.findAllByReceiverId(pageable, receiverId);
 	}
-	
-	public List<Notification> findAllByUserIdAndStatus(UUID receiverId) {
-		return notificationRepo.findAllByReceiverIdAndStatusEquals(receiverId, NotificationStatus.UNREAD);
+
+	public long countUnreadByUserId(UUID receiverId) {
+		return notificationRepo.countByReceiverIdAndStatus(receiverId, NotificationStatus.UNREAD);
 	}
 	
 	public void markAsRead(UUID id) {

@@ -7,6 +7,7 @@ import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.service.TransactionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class TransactionController {
     private final TransactionMapper transactionMapper;
 
     @GetMapping
-    public ResponseEntity<Page<TransactionsResponseDTO>> getTransactionsByUserId(
+    public ResponseEntity<PagedModel<TransactionsResponseDTO>> getTransactionsByUserId(
             @RequestHeader("X-User-Id") String userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -35,7 +36,7 @@ public class TransactionController {
             return ResponseEntity.noContent().build(); // 204 if no transactions
         }
 
-        return ResponseEntity.ok(transactions);
+        return ResponseEntity.ok(new PagedModel<>(transactions));
     }
 
 

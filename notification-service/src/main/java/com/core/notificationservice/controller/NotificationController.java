@@ -6,6 +6,7 @@ import com.core.notificationservice.model.Notification;
 import com.core.notificationservice.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -23,16 +24,16 @@ public class NotificationController {
 	private final NotificationService notificationService;
 	
 	@GetMapping("/")
-	public ResponseEntity<Page<Notification>> findAllByReceiverId(@RequestHeader("X-User-Id") UUID receiverId,
-	                                                @RequestParam(defaultValue = "0") int page,
-	                                                @RequestParam(defaultValue = "10") int size){
+	public ResponseEntity<PagedModel<Notification>> findAllByReceiverId(@RequestHeader("X-User-Id") UUID receiverId,
+	                                                                    @RequestParam(defaultValue = "0") int page,
+	                                                                    @RequestParam(defaultValue = "10") int size){
 		Page<Notification> notifications = notificationService.findAllByReceiverId(receiverId, page, size);
-		return ResponseEntity.ok(notifications);
+		return ResponseEntity.ok(new PagedModel<>(notifications));
 	}
-	
+
 	@GetMapping("/unread")
-	public Long findAllByStatus(@RequestHeader("X-User-Id") UUID receiverId){
-		return (long) notificationService.findAllByUserIdAndStatus(receiverId).size();
+	public Long getUnreadCount(@RequestHeader("X-User-Id") UUID receiverId) {
+		return notificationService.countUnreadByUserId(receiverId);
 	}
 	
 	@PatchMapping("/mark-as-read")
