@@ -5,14 +5,12 @@ import com.core.userservice.dto.UserDTO;
 import com.core.userservice.dto.UserNameUpdateRequest;
 import com.core.userservice.dto.UserStatusUpdateRequest;
 import com.core.userservice.exception.UserForbiddenException;
-import com.core.userservice.exception.UserUnauthorizedException;
 import com.core.userservice.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -47,8 +45,9 @@ public class UserController {
     @PatchMapping("/{id}/status")
     public ResponseEntity<UserDTO> updateUserStatus(@PathVariable UUID id,
                                                     @RequestHeader("X-User-Role") UserRole userRole,
+                                                    @RequestHeader("X-User-Id") UUID userId,
                                                     @Valid @RequestBody UserStatusUpdateRequest userStatusUpdateRequest) {
-        if (!userRole.equals(UserRole.ROLE_ADMIN)) {
+        if (id.equals(userId) || !userRole.equals(UserRole.ROLE_ADMIN)) {
             throw new UserForbiddenException("You are not allowed to perform this operation");
         }
 
