@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Send, PlusCircle, UserCircle } from "lucide-react";
 import api from "@/lib/axios";
-import type { Transaction, WalletBalance } from "@/types/api";
+import type { Transaction, WalletBalance, Page } from "@/types/api";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function App() {
@@ -15,13 +15,11 @@ export default function App() {
       try {
         const [balanceRes, transactionsRes] = await Promise.all([
           api.get<WalletBalance>("/wallet/balance"),
-          api.get<Transaction[]>("/transaction"),
+          api.get<Page<Transaction>>("/transaction?page=0&size=5"),
         ]);
         setBalance(balanceRes.data.balance);
 
-        // Show only the 5 most recent transactions on the home page
-        const recentTx = transactionsRes.data.slice(0, 5);
-        setTransactions(recentTx);
+        setTransactions(transactionsRes.data.content);
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
       } finally {
@@ -72,7 +70,7 @@ export default function App() {
           </Card>
         </Link>
 
-        <Link to="/funds" className="group block focus:outline-none">
+        <Link to="/coming-soon" className="group block focus:outline-none">
           <Card className="h-full rounded-3xl border-transparent bg-muted/40 shadow-sm transition-all duration-200 hover:border-border/50 hover:bg-muted/60 hover:shadow-md">
             <CardContent className="flex flex-col items-start gap-3 px-4 py-1">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
@@ -111,7 +109,7 @@ export default function App() {
               <div className="animate-pulse p-8 text-center text-sm font-medium text-muted-foreground">
                 Loading transactions...
               </div>
-            ) : transactions.length === 0 ? (
+            ) : !transactions || transactions.length === 0 ? (
               <div className="flex flex-col items-center justify-center space-y-3 p-8 text-center">
                 <div className="flex size-12 items-center justify-center rounded-full bg-muted/50 text-muted-foreground">
                   <UserCircle className="size-6 opacity-50" />
@@ -137,7 +135,11 @@ export default function App() {
                           : "Unknown User"}
                       </span>
                       <span className="mt-0.5 text-xs font-medium text-muted-foreground">
-                        {new Date(tx.timestamp).toLocaleDateString(undefined, {
+                        {new Date(
+                          tx.timestamp.endsWith("Z")
+                            ? tx.timestamp
+                            : `${tx.timestamp}Z`
+                        ).toLocaleDateString(undefined, {
                           month: "short",
                           day: "numeric",
                           hour: "2-digit",

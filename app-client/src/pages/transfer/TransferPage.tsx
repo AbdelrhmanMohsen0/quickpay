@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Phone, User as UserIcon } from "lucide-react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { isAxiosError } from "axios";
 import { useNavigate } from "react-router-dom";
 import api from "@/lib/axios";
-import { transferSchema, type TransferFormData } from "@/lib/schemas";
+import { createTransferSchema, transferSchema, type TransferFormData } from "@/lib/schemas";
 
 import {
   Card,
@@ -35,20 +35,61 @@ import { Separator } from "@/components/ui/separator";
 export function TransferPage() {
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [fee, setFee] = useState<number>(2);
-  const [isFetchingFee, setIsFetchingFee] = useState(false);
+  const [fee, setFee] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validatedData, setValidatedData] = useState<TransferFormData | null>(
     null
   );
+  const [feeConfig, setFeeConfig] = useState<{
+    fixedFee: number;
+    maxTransferAmount: number;
+    minTransferAmount: number;
+    percentageFee: number;
+  } | null>(null);
+
+  const schema = useMemo(() => {
+    if (feeConfig) {
+      return createTransferSchema(
+        feeConfig.minTransferAmount,
+        feeConfig.maxTransferAmount
+      );
+    }
+    return transferSchema;
+  }, [feeConfig]);
 
   const form = useForm<TransferFormData>({
-    resolver: zodResolver(transferSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       phone: "",
       amount: 0.0,
     },
   });
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchConfig = async () => {
+      try {
+        const response = await api.get("/transaction/fees/config");
+        if (isMounted && response.data) {
+          setFeeConfig(response.data);
+          // Only update if current value is 0 (untouched basically)
+          const currentAmount = form.getValues("amount");
+          if (currentAmount === 0) {
+            form.setValue("amount", response.data.minTransferAmount, {
+              shouldValidate: true,
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch fee config", error);
+        toast.error("Failed to load configuration.");
+      }
+    };
+    fetchConfig();
+    return () => {
+      isMounted = false;
+    };
+  }, [form]);
 
   const amountValue = form.watch("amount");
 
@@ -61,24 +102,16 @@ export function TransferPage() {
   };
 
   const onConfirmClick = async (data: TransferFormData) => {
+    if (!feeConfig) {
+      toast.error("Configuration not loaded yet. Please try again.");
+      return;
+    }
+
     setValidatedData(data);
-    setIsFetchingFee(true);
     setDrawerOpen(true);
     
-    try {
-      const response = await api.get("/transaction/fee");
-      // Assuming response.data.fee is the fee amount
-      if (response.data && typeof response.data.fee === "number") {
-        setFee(response.data.fee);
-      } else {
-        setFee(2); // Fallback if format is unexpected
-      }
-    } catch (error) {
-      console.error("Failed to fetch fee, using fallback", error);
-      setFee(2); // Fallback
-    } finally {
-      setIsFetchingFee(false);
-    }
+    const calculatedFee = feeConfig.fixedFee + (data.amount * (feeConfig.percentageFee / 100));
+    setFee(calculatedFee);
   };
 
   const handleSend = async () => {
@@ -254,29 +287,21 @@ export function TransferPage() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Transfer Fee</span>
                   <span className="font-medium">
-                    {isFetchingFee ? (
-                      <span className="animate-pulse">Calculating...</span>
-                    ) : (
-                      `${fee.toFixed(2)} EGP`
-                    )}
+                    {`${fee.toFixed(2)} EGP`}
                   </span>
                 </div>
                 <Separator />
                 <div className="flex items-center justify-between">
                   <span className="font-medium">Total to pay</span>
                   <span className="text-lg font-bold">
-                    {isFetchingFee ? (
-                       <span className="animate-pulse">...</span>
-                    ) : (
-                      `${totalAmount.toFixed(2)} EGP`
-                    )}
+                    {`${totalAmount.toFixed(2)} EGP`}
                   </span>
                 </div>
               </div>
             </div>
 
             <DrawerFooter className="pt-6">
-              <Button onClick={handleSend} disabled={isFetchingFee || isSubmitting} size="lg">
+              <Button onClick={handleSend} disabled={isSubmitting} size="lg">
                 {isSubmitting ? "Processing..." : "Confirm and Send"}
               </Button>
               <DrawerClose asChild>

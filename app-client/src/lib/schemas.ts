@@ -44,3 +44,15 @@ export const transferSchema = z.object({
 });
 
 export type TransferFormData = z.infer<typeof transferSchema>;
+
+export const createTransferSchema = (minAmount: number, maxAmount: number) => z.object({
+  phone: z
+    .string()
+    .length(11, "Phone must be 11 digits")
+    .regex(/^01[0-9]{9}$/, "Invalid Egyptian phone number"),
+  amount: z
+    .number()
+    .positive("Amount must be greater than 0")
+    .min(minAmount, `Minimum transfer amount is ${minAmount} EGP`)
+    .max(maxAmount, `Maximum transfer amount is ${maxAmount} EGP`),
+});

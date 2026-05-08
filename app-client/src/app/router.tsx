@@ -5,8 +5,10 @@ import { AuthPage } from "@/pages/auth/AuthPage";
 import { NotFoundPage } from "@/pages/errors/NotFoundPage";
 import { ServerErrorPage } from "@/pages/errors/ServerErrorPage";
 import { AccountSuspendedPage } from "@/pages/errors/AccountSuspendedPage";
+import { ComingSoonPage } from "@/pages/errors/ComingSoonPage";
 import { TransferPage } from "@/pages/transfer/TransferPage";
 import { TransferSuccessPage } from "@/pages/transfer/TransferSuccessPage";
+import { HistoryPage } from "@/pages/history/HistoryPage";
 import App from "./App";
 
 export const router = createBrowserRouter([
@@ -24,7 +26,7 @@ export const router = createBrowserRouter([
           { index: true, element: <App /> },
           { path: "transfer", element: <TransferPage /> },
           { path: "transfer/success", element: <TransferSuccessPage /> },
-        //   { path: "history", element: <HistoryPage /> },
+          { path: "history", element: <HistoryPage /> },
         //   { path: "notifications", element: <NotificationsPage /> },
 
         //   {
@@ -46,5 +48,6 @@ export const router = createBrowserRouter([
   // Error routes
   { path: "/suspended", element: <AccountSuspendedPage /> },
   { path: "/500", element: <ServerErrorPage /> },
+  { path: "/coming-soon", element: <ComingSoonPage /> },
   { path: "*", element: <NotFoundPage /> },
 ]);
