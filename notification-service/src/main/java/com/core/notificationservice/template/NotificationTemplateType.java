@@ -26,7 +26,7 @@ public enum NotificationTemplateType {
 	PAYMENT_FAILED(
         "Payment Failed ❌",
 		        "Your transaction could not be completed.",
-		        "We couldn’t process your transaction of {amount}. Please try again."
+		        "We couldn’t process your transaction of {amount} due to {rejectionReason} . Please try again."
 	);
 	
 	private final String title;
