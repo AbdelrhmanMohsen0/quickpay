@@ -56,3 +56,20 @@ export const createTransferSchema = (minAmount: number, maxAmount: number) => z.
     .min(minAmount, `Minimum transfer amount is ${minAmount} EGP`)
     .max(maxAmount, `Maximum transfer amount is ${maxAmount} EGP`),
 });
+
+export const changePasswordSchema = z
+  .object({
+    oldPassword: z.string().min(8, "Current password must be at least 8 characters"),
+    newPassword: z.string().min(8, "New password must be at least 8 characters"),
+    confirmPassword: z.string().min(8, "Confirm new password must be at least 8 characters"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.oldPassword !== data.newPassword, {
+    message: "New password must be different from current password",
+    path: ["newPassword"],
+  });
+
+export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>;
