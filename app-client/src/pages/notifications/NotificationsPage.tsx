@@ -13,6 +13,14 @@ import api from "@/lib/axios";
 import type { Notification, Page } from "@/types/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { formatRelativeTime, cn } from "@/lib/utils";
 
 const renderMessageWithAmount = (message: string, metadataString?: string) => {
@@ -67,6 +75,7 @@ const renderMessageWithAmount = (message: string, metadataString?: string) => {
 export function NotificationsPage() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -221,7 +230,8 @@ export function NotificationsPage() {
                           : undefined
                       }
                       key={notification.id}
-                      className="flex h-[104px] items-center gap-4 p-4 transition-colors hover:bg-muted/30"
+                      onClick={() => setSelectedNotification(notification)}
+                      className="flex h-[104px] cursor-pointer items-center gap-4 p-4 transition-colors hover:bg-muted/30"
                     >
                       <div
                         className={cn(
@@ -270,6 +280,36 @@ export function NotificationsPage() {
           </div>
         )}
       </div>
+
+      <Dialog open={!!selectedNotification} onOpenChange={(open) => !open && setSelectedNotification(null)}>
+        <DialogContent className="flex max-h-[80vh] flex-col gap-0 overflow-hidden p-0">
+          <div className="shrink-0 p-6 pb-4">
+            <DialogHeader>
+              <DialogTitle>{selectedNotification?.title}</DialogTitle>
+              <DialogDescription>
+                {selectedNotification &&
+                  new Date(selectedNotification.createdAt).toLocaleString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+          <div className="flex-1 overflow-y-auto px-6 py-2">
+            {selectedNotification &&
+              renderMessageWithAmount(
+                selectedNotification.message,
+                selectedNotification.metadata
+              )}
+          </div>
+          <div className="mt-auto shrink-0 sticky bottom-0 border-t bg-popover p-6 pt-4">
+            <DialogFooter showCloseButton />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
