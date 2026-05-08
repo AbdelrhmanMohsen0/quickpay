@@ -59,7 +59,7 @@ public class TransactionService {
         // Get the receiver of the provided phone number
         User receiver = userDAO.findByPhoneNumber(dto.getReceiverPhoneNumber());
         if(receiver == null) throw new UserNotFoundException("No user with such phone number");
-        if(receiver.getStatus() != UserStatus.ACTIVE) throw new UserNotFoundException("User with such phone number is already suspended");
+        if(receiver.getStatus() != UserStatus.ACTIVE) throw new UserNotFoundException("User with such phone number is suspended");
 
         // Add fees on the transfer amount and return total
         BigDecimal totalAmount = calculateTotalAmount(dto);

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { UserCircle } from "lucide-react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { UserCircle, Loader2 } from "lucide-react";
 import api from "@/lib/axios";
 import type { Transaction, Page } from "@/types/api";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,25 +7,69 @@ import { Card, CardContent } from "@/components/ui/card";
 export function HistoryPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const isFetchingRef = useRef(isFetchingMore);
+  const hasMoreRef = useRef(hasMore);
+
+  useEffect(() => {
+    isFetchingRef.current = isFetchingMore;
+  }, [isFetchingMore]);
+
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
+
+  const lastTransactionElementRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (loading) return;
+      if (observer.current) observer.current.disconnect();
+      
+      if (node) {
+        observer.current = new IntersectionObserver((entries) => {
+          if (entries[0].isIntersecting && hasMoreRef.current && !isFetchingRef.current) {
+            setPage((prevPage) => prevPage + 1);
+          }
+        }, { rootMargin: "100px" });
+        observer.current.observe(node);
+      }
+    },
+    [loading]
+  );
 
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        const response = await api.get<Page<Transaction>>("/transaction");
-        // // Sort descending by timestamp in case the API doesn't
-        // const sorted = response.data.content.sort(
-        //   (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-        // );
-        setTransactions(response.data.content);
+        if (page === 0) setLoading(true);
+        else setIsFetchingMore(true);
+
+        const response = await api.get<Page<Transaction>>(
+          `/transaction?page=${page}&size=10`
+        );
+        const content = response.data.content || [];
+        setTransactions((prev) => {
+          if (page === 0) return content;
+          
+          const newTransactions = content.filter(
+            (newTx) => !prev.some((existingTx) => existingTx.id === newTx.id)
+          );
+          return [...prev, ...newTransactions];
+        });
+        
+        setHasMore(!response.data.last);
       } catch (error) {
         console.error("Failed to fetch transactions:", error);
       } finally {
-        setLoading(false);
+        if (page === 0) setLoading(false);
+        setIsFetchingMore(false);
       }
     };
 
     fetchTransactions();
-  }, []);
+  }, [page]);
 
   return (
     <div className="flex flex-col space-y-6 p-6">
@@ -33,7 +77,7 @@ export function HistoryPage() {
 
       <Card className="overflow-hidden rounded-3xl border-muted shadow-sm p-0">
         <CardContent className="flex flex-col divide-y divide-border/40 p-0">
-          {loading ? (
+          {loading && page === 0 ? (
             <div className="animate-pulse p-8 text-center text-sm font-medium text-muted-foreground">
               Loading transactions...
             </div>
@@ -47,11 +91,13 @@ export function HistoryPage() {
               </div>
             </div>
           ) : (
-            transactions.map((tx) => (
-              <div
-                key={tx.id}
-                className="flex items-center justify-between p-4 transition-colors hover:bg-muted/30"
-              >
+            <>
+              {transactions.map((tx, index) => (
+                <div
+                  ref={transactions.length === index + 1 ? lastTransactionElementRef : undefined}
+                  key={tx.id}
+                  className="flex items-center justify-between p-4 transition-colors hover:bg-muted/30"
+                >
                 <div className="flex items-center gap-3.5">
                   <div className="flex size-11 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground/80">
                     <UserCircle className="size-6" />
@@ -87,7 +133,13 @@ export function HistoryPage() {
                   EGP
                 </div>
               </div>
-            ))
+              ))}
+              {isFetchingMore && (
+                <div className="flex items-center justify-center p-6">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
