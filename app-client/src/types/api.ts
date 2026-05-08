@@ -33,3 +33,21 @@ export interface Page<T> {
   totalElements: number;
   totalPages: number;
 }
+
+export type NotificationType = "USER_REGISTERED" | "TRANSACTION_SENT" | "TRANSACTION_RECEIVED" | "PAYMENT_FAILED";
+export type NotificationStatus = "UNREAD" | "READ";
+
+export interface Notification {
+  id: string;
+  receiverId: string;
+  receiverName: string;
+  type: NotificationType;
+  title: string;
+  shortMessage: string;
+  message: string;
+  status: NotificationStatus;
+  metadata: string;
+  createdAt: string;
+  updatedAt: string;
+  readAt: string | null;
+}

@@ -81,7 +81,7 @@ export function PasswordPage() {
   };
 
   return (
-    <div className="flex h-full min-h-[calc(100vh-9rem)] flex-col bg-muted/30">
+    <div className="flex flex-col">
       {/* Header */}
       <div className="sticky top-0 z-10 flex items-center border-b bg-background p-4">
         <Button
@@ -187,7 +187,7 @@ export function PasswordPage() {
       </div>
 
       {/* Bottom Section */}
-      <div className="sticky bottom-0 mt-auto border-t bg-background p-4">
+      <div className="mt-5 border-t bg-background p-4">
         <Button
           form="password-form"
           type="submit"

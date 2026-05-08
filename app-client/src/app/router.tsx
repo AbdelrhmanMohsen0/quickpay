@@ -12,6 +12,7 @@ import { HistoryPage } from "@/pages/history/HistoryPage";
 import { ProfilePage } from "@/pages/profile/ProfilePage";
 import { EditProfilePage } from "@/pages/profile/EditProfilePage";
 import { PasswordPage } from "@/pages/profile/PasswordPage";
+import { NotificationsPage } from "@/pages/notifications/NotificationsPage";
 import App from "./App";
 
 export const router = createBrowserRouter([
@@ -36,12 +37,13 @@ export const router = createBrowserRouter([
             path: "profile",
             children: [
               { index: true, element: <ProfilePage /> },
-              { path: "edit", element: <EditProfilePage /> },
-              { path: "password", element: <PasswordPage /> },
             ],
           },
         ],
       },
+      { path: "profile/edit", element: <EditProfilePage /> },
+      { path: "profile/password", element: <PasswordPage /> },
+      { path: "notifications", element: <NotificationsPage /> },
     ],
   },
 
