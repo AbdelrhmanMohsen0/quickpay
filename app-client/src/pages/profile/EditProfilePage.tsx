@@ -41,7 +41,7 @@ export function EditProfilePage() {
   };
 
   return (
-    <div className="flex flex-col bg-muted/30">
+    <div className="flex min-h-screen flex-col bg-muted/30 md:mx-auto md:max-w-md md:border-x md:shadow-sm">
       {/* Header */}
       <div className="flex items-center p-4 bg-background border-b sticky top-0 z-10">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)} className="mr-2">

@@ -81,7 +81,7 @@ export function PasswordPage() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background md:mx-auto md:max-w-md md:border-x md:shadow-sm">
       {/* Header */}
       <div className="sticky top-0 z-10 flex items-center border-b bg-background p-4">
         <Button

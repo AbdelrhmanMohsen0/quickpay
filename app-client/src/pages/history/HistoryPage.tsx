@@ -43,8 +43,12 @@ export function HistoryPage() {
   useEffect(() => {
     const fetchTransactions = async () => {
       try {
-        if (page === 0) setLoading(true);
-        else setIsFetchingMore(true);
+        if (page === 0) {
+          setLoading(true);
+        } else {
+          setIsFetchingMore(true);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
 
         const response = await api.get<Page<Transaction>>(
           `/transaction?page=${page}&size=10`
@@ -59,7 +63,11 @@ export function HistoryPage() {
           return [...prev, ...newTransactions];
         });
         
-        setHasMore(!response.data.last);
+        const isLastPage =
+          response.data.last !== undefined
+            ? response.data.last
+            : content.length < 10;
+        setHasMore(!isLastPage);
       } catch (error) {
         console.error("Failed to fetch transactions:", error);
       } finally {
@@ -143,6 +151,16 @@ export function HistoryPage() {
           )}
         </CardContent>
       </Card>
+      {!hasMore && transactions.length > 0 && (
+        <div className="flex flex-col items-center justify-center space-y-3 p-8 pb-12 text-center">
+          <div className="flex size-16 items-center justify-center rounded-full border-2 border-dashed border-muted-foreground/20 bg-transparent text-muted-foreground/50">
+            <UserCircle className="size-6" />
+          </div>
+          <div className="text-xs font-bold tracking-wider text-muted-foreground/50">
+            END OF TRANSACTIONS
+          </div>
+        </div>
+      )}
     </div>
   );
 }

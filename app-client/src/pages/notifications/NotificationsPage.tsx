@@ -111,8 +111,12 @@ export function NotificationsPage() {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        if (page === 0) setLoading(true);
-        else setIsFetchingMore(true);
+        if (page === 0) {
+          setLoading(true);
+        } else {
+          setIsFetchingMore(true);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
 
         const response = await api.get<Page<Notification>>(
           `/notification?page=${page}&size=10`
@@ -128,7 +132,11 @@ export function NotificationsPage() {
           return [...prev, ...newNotifications];
         });
 
-        setHasMore(!response.data.last);
+        const isLastPage =
+          response.data.last !== undefined
+            ? response.data.last
+            : content.length < 10;
+        setHasMore(!isLastPage);
       } catch (error) {
         console.error("Failed to fetch notifications:", error);
       } finally {
@@ -171,7 +179,7 @@ export function NotificationsPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-muted/30">
+    <div className="flex min-h-screen flex-col bg-muted/30 md:mx-auto md:max-w-md md:border-x md:shadow-sm">
       {/* Header */}
       <div className="sticky top-0 z-10 flex items-center border-b bg-background p-4">
         <Button
@@ -251,6 +259,16 @@ export function NotificationsPage() {
             )}
           </CardContent>
         </Card>
+        {!hasMore && notifications.length > 0 && (
+          <div className="flex flex-col items-center justify-center space-y-3 p-8 pb-12 text-center">
+            <div className="flex size-16 items-center justify-center rounded-full border-2 border-dashed border-muted-foreground/20 bg-transparent text-muted-foreground/50">
+              <Bell className="size-6" />
+            </div>
+            <div className="text-xs font-bold tracking-wider text-muted-foreground/50">
+              END OF NOTIFICATIONS
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
