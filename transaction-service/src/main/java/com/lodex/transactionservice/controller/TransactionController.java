@@ -1,5 +1,6 @@
 package com.lodex.transactionservice.controller;
 import com.lodex.transactionservice.model.dto.*;
+import com.lodex.transactionservice.model.entity.UserRole;
 import org.springframework.data.domain.Page;
 import com.lodex.transactionservice.mapper.TransactionMapper;
 import com.lodex.transactionservice.model.entity.Transaction;
@@ -62,7 +63,7 @@ public class TransactionController {
             @Valid @RequestBody FeeConfigDTO configDto,
             @RequestHeader(value = "X-User-Role", required = false) String userRole) {
 
-        if (userRole == null || !userRole.equalsIgnoreCase("admin")) {
+        if (userRole == null || !userRole.equalsIgnoreCase(String.valueOf(UserRole.ROLE_ADMIN))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admin role required to update fees.");
         }
 
