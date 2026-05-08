@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate, Navigate } from "react-router-dom";
 import { CheckCircle2, User as UserIcon } from "lucide-react";
 
@@ -16,14 +17,23 @@ export function TransferSuccessPage() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  const state = location.state as TransferSuccessState;
+  const [successData] = useState<TransferSuccessState | null>(
+    () => location.state as TransferSuccessState
+  );
 
-  if (!state) {
+  useEffect(() => {
+    // Clear location state so that back navigation won't show this page again
+    if (location.state) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [location.pathname, location.state, navigate]);
+
+  if (!successData) {
     // If accessed directly without state, redirect to home
     return <Navigate to="/" replace />;
   }
 
-  const formattedDate = new Date(state.date).toLocaleString("en-EG", {
+  const formattedDate = new Date(successData.date).toLocaleString("en-EG", {
     dateStyle: "medium",
     timeStyle: "short",
   });
@@ -48,7 +58,7 @@ export function TransferSuccessPage() {
           <div className="flex flex-col items-center justify-center mb-6">
             <span className="text-sm text-muted-foreground mb-1">Transfer Amount</span>
             <span className="text-4xl font-bold tracking-tighter">
-              {state.amount.toFixed(2)} EGP
+              {successData.amount.toFixed(2)} EGP
             </span>
           </div>
           
@@ -59,7 +69,7 @@ export function TransferSuccessPage() {
               <span className="text-muted-foreground">Recipient</span>
               <div className="flex items-center gap-2">
                 <UserIcon className="size-4 text-muted-foreground" />
-                <span className="font-medium">{state.recipientPhone}</span>
+                <span className="font-medium">{successData.recipientPhone}</span>
               </div>
             </div>
             
@@ -71,7 +81,7 @@ export function TransferSuccessPage() {
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Transaction ID</span>
               <span className="font-mono text-xs font-medium text-muted-foreground">
-                {state.transactionId}
+                {successData.transactionId}
               </span>
             </div>
           </div>
