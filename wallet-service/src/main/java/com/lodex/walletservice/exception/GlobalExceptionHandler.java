@@ -34,23 +34,29 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-//    // if a user inquired his balance before this service receive user.created event
-//    @ExceptionHandler(WalletNotFoundException.class)
-//    public ResponseEntity<Map<String, String>> handleWalletNotFoundExceptions(WalletNotFoundException ex) {
-//        return ResponseEntity.status(HttpStatus.CONFLICT)
-//                .body(Map.of("message", ex.getMessage()));
-//    }
+    // if a user inquired his balance before this service receive user.created event
+    @ExceptionHandler(WalletNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleWalletNotFoundExceptions(WalletNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", ex.getMessage()));
+    }
 
-//    // No enough fund to transfer
-//    @ExceptionHandler(NotEnoughFundException.class)
-//    public ResponseEntity<Map<String, String>> handleNotEnoughFundExceptions(NotEnoughFundException ex) {
-//        return ResponseEntity.status(HttpStatus.CONFLICT)
-//                .body(Map.of("message", ex.getMessage()));
-//    }
+    // No enough fund to transfer
+    @ExceptionHandler(NotEnoughFundException.class)
+    public ResponseEntity<Map<String, String>> handleNotEnoughFundExceptions(NotEnoughFundException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", ex.getMessage()));
+    }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleDatabaseDuplicateKey(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("message", "Transaction already processed."));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", "An unexpected error occurred. Please try again later."));
     }
 }
