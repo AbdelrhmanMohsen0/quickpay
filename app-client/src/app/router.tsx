@@ -9,6 +9,7 @@ import { ComingSoonPage } from "@/pages/errors/ComingSoonPage";
 import { TransferPage } from "@/pages/transfer/TransferPage";
 import { TransferSuccessPage } from "@/pages/transfer/TransferSuccessPage";
 import { HistoryPage } from "@/pages/history/HistoryPage";
+import { ProfilePage } from "@/pages/profile/ProfilePage";
 import App from "./App";
 
 export const router = createBrowserRouter([
@@ -29,14 +30,14 @@ export const router = createBrowserRouter([
           { path: "history", element: <HistoryPage /> },
         //   { path: "notifications", element: <NotificationsPage /> },
 
-        //   {
-        //     path: "profile",
-        //     children: [
-        //       { index: true, element: <ProfilePage /> },
-        //       { path: "settings", element: <SettingsPage /> },
-        //       { path: "security", element: <SecurityPage /> },
-        //     ],
-        //   },
+          {
+            path: "profile",
+            children: [
+              { index: true, element: <ProfilePage /> },
+            //   { path: "settings", element: <SettingsPage /> },
+            //   { path: "security", element: <SecurityPage /> },
+            ],
+          },
         ],
       },
     ],
