@@ -2,6 +2,7 @@ package com.lodex.transactionservice.service;
 import com.lodex.transactionservice.mapper.TransactionConfigMapper;
 import com.lodex.transactionservice.model.dto.FeeConfigDTO;
 import com.lodex.transactionservice.model.dto.TransactionFeesResponseDTO;
+import com.lodex.transactionservice.model.entity.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -56,6 +57,7 @@ public class TransactionService {
         // Get the receiver of the provided phone number
         User receiver = userDAO.findByPhoneNumber(dto.getReceiverPhoneNumber());
         if(receiver == null) throw new UserNotFoundException("No user with such phone number");
+        if(receiver.getStatus() == UserStatus.SUSPENDED) throw new UserNotFoundException("User with such phone number is already suspended");
 
         // Add fees on the transfer amount and return total
         BigDecimal totalAmount = calculateTotalAmount(dto);
