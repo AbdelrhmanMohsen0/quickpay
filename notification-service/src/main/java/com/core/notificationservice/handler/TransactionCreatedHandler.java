@@ -28,7 +28,8 @@ public class TransactionCreatedHandler {
 			var template = templateService.build(
 					NotificationTemplateType.PAYMENT_FAILED,
 					Map.of(
-							"amount", event.getAmount().toString()
+							"amount", event.getAmount().toString(),
+							"rejectionReason", event.getRejectionReason()
 					)
 			);
 			

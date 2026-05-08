@@ -19,5 +19,6 @@ public class TransactionCreatedEvent {
 	private String receiverName;
 	private Double amount;
 	private TransactionStatus status;
+	private String rejectionReason;
 	
 }
