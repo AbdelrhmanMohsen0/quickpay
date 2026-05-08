@@ -11,6 +11,7 @@ import com.core.notificationservice.service.NotificationTemplateService;
 import com.core.notificationservice.template.NotificationTemplateType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class TransactionCreatedHandler {
 	
 	//todo: fix the logic of the notification building and check who will receive what and how
 	private final NotificationTemplateService templateService;
+	private final ObjectMapper objectMapper;
 	
 	
 	public List<Notification> handle(TransactionCreatedEvent event) {
@@ -63,7 +65,12 @@ public class TransactionCreatedHandler {
 						"transactionId", event.getTransactionId().toString()
 				)
 		);
-		
+
+		Map<String, Object> metadataMap = Map.of(
+				"amount", event.getAmount().toString(),
+				"transactionId", event.getTransactionId().toString()
+		);
+
 		Notification senderNotification = Notification.builder()
 				.type(NotificationType.TRANSACTION_SENT)
 				.title(senderTemplate.getTitle())
@@ -72,8 +79,7 @@ public class TransactionCreatedHandler {
 				.shortMessage(senderTemplate.getShortMessage())
 				.status(NotificationStatus.UNREAD)
 				.receiverName(event.getReceiverName())
-				.metadata(Map.of("amount", event.getAmount(),
-						"transactionId", event.getTransactionId()).toString())
+				.metadata(objectMapper.writeValueAsString(metadataMap))
 				.build();
 		
 		Notification receiverNotification = Notification.builder()
@@ -84,8 +90,7 @@ public class TransactionCreatedHandler {
 				.shortMessage(receiverTemplate.getShortMessage())
 				.status(NotificationStatus.UNREAD)
 				.receiverName(event.getReceiverName())
-				.metadata(Map.of("amount", event.getAmount(),
-						"transactionId", event.getTransactionId()).toString())
+				.metadata(objectMapper.writeValueAsString(metadataMap))
 				.build();
 		
 		return List.of(senderNotification, receiverNotification);
