@@ -140,6 +140,7 @@ export const AuthProvider = ({ children }: Props) => {
         login,
         signup,
         logout,
+        refreshUser: async () => { await fetchUser(); },
       }}
     >
       {loading || isProvisioning ? (

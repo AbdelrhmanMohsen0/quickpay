@@ -10,6 +10,7 @@ import { TransferPage } from "@/pages/transfer/TransferPage";
 import { TransferSuccessPage } from "@/pages/transfer/TransferSuccessPage";
 import { HistoryPage } from "@/pages/history/HistoryPage";
 import { ProfilePage } from "@/pages/profile/ProfilePage";
+import { EditProfilePage } from "@/pages/profile/EditProfilePage";
 import App from "./App";
 
 export const router = createBrowserRouter([
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
             path: "profile",
             children: [
               { index: true, element: <ProfilePage /> },
+              { path: "edit", element: <EditProfilePage /> },
             //   { path: "settings", element: <SettingsPage /> },
             //   { path: "security", element: <SecurityPage /> },
             ],

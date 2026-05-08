@@ -14,6 +14,7 @@ export type AuthContextType = {
   login: (data: LoginInput) => Promise<void>;
   signup: (data: SignupInput) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 };
 
 export type LoginInput = {
