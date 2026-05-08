@@ -38,7 +38,7 @@ public class TransactionCreatedHandler {
 			Notification failedNotification = Notification.builder()
 					.type(NotificationType.PAYMENT_FAILED)
 					.title(template.getTitle())
-					.message(template.getShortMessage())
+					.message(template.getLongMessage())
 					.receiverId(event.getSenderId())
 					.shortMessage(template.getShortMessage())
 					.status(NotificationStatus.UNREAD)

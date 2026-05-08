@@ -11,22 +11,22 @@ public enum NotificationTemplateType {
 	
 	TRANSACTION_SENT(
         "Money Sent",
-		        "You sent {amount} to {receiverName}.",
-		        "Your transfer of {amount} to {receiverName} was completed successfully. " +
+		        "You sent {amount} EGP to {receiverName}.",
+		        "Your transfer of {amount} EGP to {receiverName} was completed successfully. " +
 				        "The transaction reference number is: {transactionId}"
 	),
 	
 	TRANSACTION_RECEIVED(
         "Money Received",
-		        "You received {amount} from {senderName}.",
-		        "{senderName} sent you {amount}. The amount has been added to your account. " +
+		        "You received {amount} EGP from {senderName}.",
+		        "{senderName} sent you {amount} EGP. The amount has been added to your account. " +
 				        "The transaction reference number is: {transactionId}"
 	),
 	
 	PAYMENT_FAILED(
         "Payment Failed",
 		        "Your transaction could not be completed.",
-		        "We couldn’t process your transaction of {amount} due to {rejectionReason} . Please try again."
+		        "We couldn’t process your transaction of {amount} EGP because of the following: {rejectionReason}"
 	);
 	
 	private final String title;
