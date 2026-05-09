@@ -17,17 +17,6 @@ public class KafkaProducerService {
 
     public void produceTransactionCreatedEvent(TransactionToWalletDTO transaction) {
         String event = objectMapper.writeValueAsString(transaction);
-
-        System.out.println("[TRANSACTION CREATED]" + event);
-        System.out.println("[TRANSACTION CREATED]" + event);
-        System.out.println("[TRANSACTION CREATED]" + event);
-        System.out.println("[TRANSACTION CREATED]" + event);
-        System.out.println("[TRANSACTION CREATED]" + event);
-        System.out.println("[TRANSACTION CREATED]" + event);
-        System.out.println("[TRANSACTION CREATED]" + event);
-        System.out.println("[TRANSACTION CREATED]" + event);
-        System.out.println("[TRANSACTION CREATED]" + event);
-
         kafkaTemplate.send("transaction.created", event);
     }
     public void produceTransactionNotificationEvent(NotificationDTO notification) {

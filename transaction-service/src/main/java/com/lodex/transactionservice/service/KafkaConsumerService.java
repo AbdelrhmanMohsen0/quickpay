@@ -2,8 +2,10 @@ package com.lodex.transactionservice.service;
 
 import com.lodex.transactionservice.cache.TransactionFeesCache;
 import com.lodex.transactionservice.dao.UserDAO;
+import com.lodex.transactionservice.mapper.TransactionMapper;
 import com.lodex.transactionservice.model.dto.FeeConfigDTO;
 import com.lodex.transactionservice.model.dto.NotificationDTO;
+import com.lodex.transactionservice.model.dto.TransactionToWalletDTO;
 import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.model.entity.User;
 import com.lodex.transactionservice.model.entity.UserStatus;
@@ -17,16 +19,17 @@ import tools.jackson.databind.ObjectMapper;
 public class KafkaConsumerService {
 
     private final ObjectMapper objectMapper;
+    private final TransactionMapper transactionMapper;
     private final TransactionService transactionService;
     private final NotificationService notificationService;
     private final KafkaProducerService kafkaProducerService;
-    private final TransactionFeesCache feesCache;
     private final UserDAO userDAO;
     private final String groupId = "transaction-group";
 
     @KafkaListener(topics = "wallet.transaction.processed", groupId = groupId)
     public void listenWalletTransactionProcessed(String transactionStr) {
-        Transaction processedTransaction = objectMapper.readValue(transactionStr, Transaction.class);
+        TransactionToWalletDTO processedTransactionDto = objectMapper.readValue(transactionStr, TransactionToWalletDTO.class);
+        Transaction processedTransaction = transactionMapper.toEntity(processedTransactionDto);
         Transaction updatedTransaction = transactionService.updateTransaction(processedTransaction);
         NotificationDTO notification = notificationService.createNotification(updatedTransaction);
         kafkaProducerService.produceTransactionNotificationEvent(notification);

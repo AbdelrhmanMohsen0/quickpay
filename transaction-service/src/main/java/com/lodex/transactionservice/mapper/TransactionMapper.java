@@ -37,13 +37,14 @@ public class TransactionMapper implements ITransactionMapper {
     public NotificationDTO toNotificationDto(Transaction transaction, String senderName, String receiverName) {
         NotificationDTO dto = new NotificationDTO();
         dto.setTransactionId(transaction.getId());
-        dto.setRejectionReason(transaction.getRejectionReason());
-        dto.setSenderName(senderName);
         dto.setReceiverName(receiverName);
         dto.setSenderId(UUID.fromString(transaction.getSenderId()));
         dto.setReceiverId(UUID.fromString(transaction.getReceiverId()));
         dto.setAmount(transaction.getAmount().doubleValue());
         dto.setStatus(transaction.getStatus().name());
+
+        String reason = transaction.getRejectionReason();
+        dto.setRejectionReason(reason != null ? reason : "");        dto.setSenderName(senderName);
         return dto;
     }
 
@@ -51,13 +52,22 @@ public class TransactionMapper implements ITransactionMapper {
         TransactionsResponseDTO dto = new TransactionsResponseDTO();
 
         dto.setId(transaction.getId());
-        dto.setAmount(transaction.getAmount());
         dto.setStatus(transaction.getStatus());
         dto.setTimestamp(transaction.getTimestamp());
         dto.setRejectionReason(transaction.getRejectionReason());
 
         boolean isSender = transaction.getSenderId().equals(loggedInUserId);
         dto.setType(isSender ? TransactionTransferType.SENT : TransactionTransferType.RECEIVED);
+
+        if (isSender) {
+            // The sender sees the total amount that was deducted from their wallet
+            dto.setAmount(transaction.getAmount());
+        } else {
+            // The receiver sees the total amount MINUS the fee
+            // Null check included just in case older database records have a null fee
+            BigDecimal fee = transaction.getFee() != null ? transaction.getFee() : BigDecimal.ZERO;
+            dto.setAmount(transaction.getAmount().subtract(fee));
+        }
 
         String targetUserIdStr = isSender ? transaction.getReceiverId() : transaction.getSenderId();
 
@@ -93,5 +103,22 @@ public class TransactionMapper implements ITransactionMapper {
         dto.setFeePercentage(feePercentage);
 
         return dto;
+    }
+
+    public Transaction toEntity(TransactionToWalletDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        Transaction transaction = new Transaction();
+
+        transaction.setId(dto.getId());
+        transaction.setSenderId(dto.getSenderId());
+        transaction.setReceiverId(dto.getReceiverId());
+        transaction.setIdempotencyKey(dto.getIdempotencyKey());
+        transaction.setAmount(dto.getAmount());
+        transaction.setStatus(dto.getStatus());
+        transaction.setTimestamp(dto.getTimestamp());
+        return transaction;
     }
 }

@@ -23,6 +23,9 @@ public class Transaction {
     @Column(precision = 19, scale = 4)
     private BigDecimal amount;
 
+    @Column(precision = 19, scale = 4)
+    private BigDecimal fee;
+
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 

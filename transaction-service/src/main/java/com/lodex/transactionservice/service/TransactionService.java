@@ -62,8 +62,9 @@ public class TransactionService {
         if(receiver == null) throw new UserNotFoundException("No user with such phone number");
         if(receiver.getStatus() != UserStatus.ACTIVE) throw new UserNotFoundException("User with such phone number is suspended");
 
-        // Add fees on the transfer amount and return total
-        BigDecimal totalAmount = calculateTotalAmount(dto);
+        // Calculate fees and the total amount
+        BigDecimal fee = calculateFee(dto);
+        BigDecimal totalAmount = dto.getAmount().add(fee);
 
         // Create new pending transaction
         Transaction newTransaction = transactionMapper.toEntity(dto, idempotencyKey);
@@ -71,16 +72,10 @@ public class TransactionService {
         newTransaction.setStatus(TransactionStatus.PENDING);
         newTransaction.setAmount(totalAmount);
         newTransaction.setTimestamp(LocalDateTime.now(ZoneOffset.UTC));
+        newTransaction.setFee(fee);
 
         // Save to database
         Transaction insertedTransaction = transactionDAO.save(newTransaction);
-        System.out.println("[insertedTransaction] \n" + insertedTransaction);
-        System.out.println("[insertedTransaction] \n" + insertedTransaction);
-        System.out.println("[insertedTransaction] \n" + insertedTransaction);
-        System.out.println("[insertedTransaction] \n" + insertedTransaction);
-        System.out.println("[insertedTransaction] \n" + insertedTransaction);
-        System.out.println("[insertedTransaction] \n" + insertedTransaction);
-        System.out.println("[insertedTransaction] \n" + insertedTransaction);
         TransactionToWalletDTO transactionToWalletDTO = transactionMapper.toTransactionToWalletDTO(insertedTransaction, transactionFeesCache.getFixedFee(), transactionFeesCache.getPercentageFee());
 
         // Publish to Kafka Topic for Wallet-Service
@@ -89,7 +84,7 @@ public class TransactionService {
         return insertedTransaction;
     }
 
-    private BigDecimal calculateTotalAmount(TransferRequestDTO dto) {
+    private BigDecimal calculateFee(TransferRequestDTO dto) {
         // Take a single atomic snapshot of the fee config
         TransactionFeesCache.Fees fees = transactionFeesCache.getFees();
 
@@ -115,11 +110,10 @@ public class TransactionService {
                 .multiply(fees.percentageFee())
                 .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
 
-        BigDecimal totalFee = fees.fixedFee()
+        // Return ONLY the fee
+        return fees.fixedFee()
                 .add(percentagePart)
                 .setScale(2, RoundingMode.HALF_UP);
-
-        return amount.add(totalFee);
     }
 
     public Transaction updateTransaction(Transaction processedTransaction) {

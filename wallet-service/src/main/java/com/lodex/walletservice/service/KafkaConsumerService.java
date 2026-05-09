@@ -33,36 +33,10 @@ public class KafkaConsumerService {
             walletService.transfer(dto);
             dto.setStatus(String.valueOf(TransactionStatus.SUCCESS));
         } catch (Exception e) {
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
             dto.setStatus(String.valueOf(TransactionStatus.REJECTED));
             dto.setRejectionReason(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
-            System.err.println(e.getMessage());
         } finally {
             TransactionEventDTO eventDto = transactionMapper.toTransactionEventDTO(dto);
-            log.info("SEND TO Transaction : " + eventDto);
-            log.info("SEND TO Transaction : " + eventDto);
-            log.info("SEND TO Transaction : " + eventDto);
-            log.info("SEND TO Transaction : " + eventDto);
-            log.info("SEND TO Transaction : " + eventDto);
             kafkaProducerService.produceTransactionProcessedEvent(eventDto);
         }
 

@@ -14,6 +14,9 @@ import com.lodex.walletservice.repository.WalletRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 
 @Service
@@ -69,11 +72,25 @@ public class WalletService {
 
         // update balances
         senderWallet.setBalance(senderWallet.getBalance().subtract(dto.getAmount()));
-        receiverWallet.setBalance(receiverWallet.getBalance().add(dto.getAmount()));
+
+        BigDecimal receiverAmount = calculateReceiverAmount(dto.getAmount(), dto.getFixedFees(), dto.getFeePercentage());
+        receiverWallet.setBalance(receiverWallet.getBalance().add(receiverAmount));
 
         // save to the database
         walletRepo.save(senderWallet);
         walletRepo.save(receiverWallet);
 
+    }
+
+    private BigDecimal calculateReceiverAmount(BigDecimal totalAmount, BigDecimal fixedFees, BigDecimal feePercentage) {
+        BigDecimal oneHundred = new BigDecimal("100");
+
+        BigDecimal percentageFactor = BigDecimal.ONE.add(
+                feePercentage.divide(oneHundred, 4, RoundingMode.HALF_UP)
+        );
+
+        return totalAmount
+                .subtract(fixedFees)
+                .divide(percentageFactor, 2, RoundingMode.HALF_UP);
     }
 }
