@@ -1,8 +1,8 @@
 package com.lodex.transactionservice.service;
 import com.lodex.transactionservice.mapper.TransactionConfigMapper;
-import com.lodex.transactionservice.model.dto.FeeConfigDTO;
-import com.lodex.transactionservice.model.dto.TransactionFeesResponseDTO;
+import com.lodex.transactionservice.model.dto.*;
 import com.lodex.transactionservice.model.entity.UserStatus;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,8 +15,6 @@ import com.lodex.transactionservice.exception.DuplicateTransactionException;
 import com.lodex.transactionservice.exception.TransferAmountViolated;
 import com.lodex.transactionservice.exception.UserNotFoundException;
 import com.lodex.transactionservice.mapper.TransactionMapper;
-import com.lodex.transactionservice.model.dto.TransactionsResponseDTO;
-import com.lodex.transactionservice.model.dto.TransferRequestDTO;
 import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.model.entity.TransactionStatus;
 import com.lodex.transactionservice.model.entity.User;
@@ -25,6 +23,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Slf4j
 @Service
@@ -49,6 +49,7 @@ public class TransactionService {
                 transactionMapper.toTransactionsResponseDTO(transaction, userId));
     }
 
+    @Transactional
     public Transaction createTransaction(TransferRequestDTO dto, String idempotencyKey) {
         // First Check if transaction is processed
         // I'll use Redis here to check for the idempotency key cus faster
@@ -69,12 +70,21 @@ public class TransactionService {
         newTransaction.setReceiverId(String.valueOf(receiver.getId()));
         newTransaction.setStatus(TransactionStatus.PENDING);
         newTransaction.setAmount(totalAmount);
+        newTransaction.setTimestamp(LocalDateTime.now(ZoneOffset.UTC));
 
         // Save to database
         Transaction insertedTransaction = transactionDAO.save(newTransaction);
+        System.out.println("[insertedTransaction] \n" + insertedTransaction);
+        System.out.println("[insertedTransaction] \n" + insertedTransaction);
+        System.out.println("[insertedTransaction] \n" + insertedTransaction);
+        System.out.println("[insertedTransaction] \n" + insertedTransaction);
+        System.out.println("[insertedTransaction] \n" + insertedTransaction);
+        System.out.println("[insertedTransaction] \n" + insertedTransaction);
+        System.out.println("[insertedTransaction] \n" + insertedTransaction);
+        TransactionToWalletDTO transactionToWalletDTO = transactionMapper.toTransactionToWalletDTO(insertedTransaction, transactionFeesCache.getFixedFee(), transactionFeesCache.getPercentageFee());
 
         // Publish to Kafka Topic for Wallet-Service
-        kafkaProducerService.produceTransactionCreatedEvent(insertedTransaction);
+        kafkaProducerService.produceTransactionCreatedEvent(transactionToWalletDTO);
 
         return insertedTransaction;
     }

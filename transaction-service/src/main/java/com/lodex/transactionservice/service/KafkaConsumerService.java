@@ -6,6 +6,7 @@ import com.lodex.transactionservice.model.dto.FeeConfigDTO;
 import com.lodex.transactionservice.model.dto.NotificationDTO;
 import com.lodex.transactionservice.model.entity.Transaction;
 import com.lodex.transactionservice.model.entity.User;
+import com.lodex.transactionservice.model.entity.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class KafkaConsumerService {
     @KafkaListener(topics = "user.created", groupId = groupId)
     public void listenUserCreated(String userStr) {
         User user = objectMapper.readValue(userStr, User.class);
+        user.setStatus(UserStatus.ACTIVE);
         userDAO.save(user);
     }
 

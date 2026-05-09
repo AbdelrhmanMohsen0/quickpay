@@ -2,15 +2,19 @@ package com.lodex.walletservice.service;
 
 import com.lodex.walletservice.exception.NotEnoughFundException;
 import com.lodex.walletservice.exception.WalletNotFoundException;
+import com.lodex.walletservice.mapper.TransactionMapper;
+import com.lodex.walletservice.model.dto.ReceivedTransactionDTO;
 import com.lodex.walletservice.model.dto.TransactionEventDTO;
 import com.lodex.walletservice.model.entity.TransactionStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class KafkaConsumerService {
@@ -18,21 +22,48 @@ public class KafkaConsumerService {
     private final ObjectMapper objectMapper;
     private final WalletService  walletService;
     private final KafkaProducerService  kafkaProducerService;
+    private final TransactionMapper transactionMapper;
 
     @KafkaListener(topics = "transaction.created", groupId = "wallet-service-group")
     public void transactionCreatedListen(String transactionStr) {
         System.out.println("Received transaction created: " + transactionStr);
-        TransactionEventDTO dto = objectMapper.readValue(transactionStr, TransactionEventDTO.class);
-
+        ReceivedTransactionDTO dto = objectMapper.readValue(transactionStr, ReceivedTransactionDTO.class);
+        log.info("Received transaction created: " + dto);
         try {
             walletService.transfer(dto);
             dto.setStatus(String.valueOf(TransactionStatus.SUCCESS));
         } catch (Exception e) {
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
             dto.setStatus(String.valueOf(TransactionStatus.REJECTED));
             dto.setRejectionReason(e.getMessage());
             System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
+            System.err.println(e.getMessage());
         } finally {
-            kafkaProducerService.produceTransactionProcessedEvent(dto);
+            TransactionEventDTO eventDto = transactionMapper.toTransactionEventDTO(dto);
+            log.info("SEND TO Transaction : " + eventDto);
+            log.info("SEND TO Transaction : " + eventDto);
+            log.info("SEND TO Transaction : " + eventDto);
+            log.info("SEND TO Transaction : " + eventDto);
+            log.info("SEND TO Transaction : " + eventDto);
+            kafkaProducerService.produceTransactionProcessedEvent(eventDto);
         }
 
         System.out.println("DONE: " + dto);

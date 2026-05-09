@@ -7,6 +7,7 @@ import com.lodex.transactionservice.model.entity.TransactionTransferType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -71,6 +72,25 @@ public class TransactionMapper implements ITransactionMapper {
                 dto.setUserInfo(userDTO);
             });
         }
+
+        return dto;
+    }
+
+    public TransactionToWalletDTO toTransactionToWalletDTO(Transaction transaction, BigDecimal fixedFees, BigDecimal feePercentage) {
+        if (transaction == null) {
+            return null;
+        }
+
+        TransactionToWalletDTO dto = new TransactionToWalletDTO();
+        dto.setId(transaction.getId());
+        dto.setSenderId(transaction.getSenderId());
+        dto.setReceiverId(transaction.getReceiverId());
+        dto.setIdempotencyKey(transaction.getIdempotencyKey());
+        dto.setAmount(transaction.getAmount());
+        dto.setStatus(transaction.getStatus());
+        dto.setTimestamp(transaction.getTimestamp());
+        dto.setFixedFees(fixedFees);
+        dto.setFeePercentage(feePercentage);
 
         return dto;
     }

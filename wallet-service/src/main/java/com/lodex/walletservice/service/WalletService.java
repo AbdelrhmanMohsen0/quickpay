@@ -4,6 +4,7 @@ import com.lodex.walletservice.exception.WalletNotFoundException;
 import com.lodex.walletservice.exception.NotEnoughFundException;
 import com.lodex.walletservice.mapper.TransactionMapper;
 import com.lodex.walletservice.mapper.WalletMapper;
+import com.lodex.walletservice.model.dto.ReceivedTransactionDTO;
 import com.lodex.walletservice.model.dto.TransactionEventDTO;
 import com.lodex.walletservice.model.dto.WalletResponseDTO;
 import com.lodex.walletservice.model.entity.Transaction;
@@ -42,7 +43,7 @@ public class WalletService {
     }
 
     @Transactional
-    public void transfer(TransactionEventDTO dto) {
+    public void transfer(ReceivedTransactionDTO dto) {
         /*
         * Here I create a Transaction (id, idempotencyKey) to ensure that the transaction is processed only once
         * TransactionService will throw exception if there are duplicates

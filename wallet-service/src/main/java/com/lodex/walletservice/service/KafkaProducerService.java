@@ -14,6 +14,14 @@ public class KafkaProducerService {
     private final ObjectMapper objectMapper;
 
     public void produceTransactionProcessedEvent(TransactionEventDTO transaction) {
+        System.out.println("[PRODUCE TRANSACTION PROCESSED EVENT]");
+        System.out.println("[PRODUCE TRANSACTION PROCESSED EVENT]");
+        System.out.println("[PRODUCE TRANSACTION PROCESSED EVENT]");
+        System.out.println("[PRODUCE TRANSACTION PROCESSED EVENT]");
+        System.out.println(transaction);
+        System.out.println("[PRODUCE TRANSACTION PROCESSED EVENT]");
+        System.out.println("[PRODUCE TRANSACTION PROCESSED EVENT]");
+        System.out.println("[PRODUCE TRANSACTION PROCESSED EVENT]");
         String event = objectMapper.writeValueAsString(transaction);
         kafkaTemplate.send("wallet.transaction.processed", event);
     }
