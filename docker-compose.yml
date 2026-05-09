@@ -170,6 +170,29 @@ services:
       TRANSACTION_SERVICE_URI: http://transaction-service:8080
       WALLET_SERVICE_URI: http://wallet-service:8080
       NOTIFICATION_SERVICE_URI: http://notification-service:8080
+
+  # ADMIN DASHBOARD CLIENT
+  admin-dashboard-client:
+    build:
+      context: ./admin-dashboard-client
+      args:
+        - VITE_APP_API_BASE_URL=http://localhost:8080/api/v1
+    container_name: admin-dashboard-client
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_APP_API_BASE_URL: http://localhost:8080/api/v1
+    
+  # APP CLIENT
+  app-client:
+    build: 
+      context: ./app-client
+      args:
+        - VITE_APP_API_BASE_URL=http://localhost:8080/api/v1
+    container_name: app-client
+    ports:
+      - "5174:5174"
+
 volumes:
   auth_data:
   user_data:

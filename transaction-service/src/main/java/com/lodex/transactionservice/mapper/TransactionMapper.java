@@ -8,9 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,14 +35,18 @@ public class TransactionMapper implements ITransactionMapper {
     public NotificationDTO toNotificationDto(Transaction transaction, String senderName, String receiverName) {
         NotificationDTO dto = new NotificationDTO();
         dto.setTransactionId(transaction.getId());
+        dto.setSenderName(senderName);
         dto.setReceiverName(receiverName);
         dto.setSenderId(UUID.fromString(transaction.getSenderId()));
         dto.setReceiverId(UUID.fromString(transaction.getReceiverId()));
-        dto.setAmount(transaction.getAmount().doubleValue());
         dto.setStatus(transaction.getStatus().name());
 
         String reason = transaction.getRejectionReason();
-        dto.setRejectionReason(reason != null ? reason : "");        dto.setSenderName(senderName);
+        dto.setRejectionReason(reason != null ? reason : "");
+
+        BigDecimal fee = transaction.getFee() != null ? transaction.getFee() : BigDecimal.ZERO;
+        BigDecimal pureAmount = transaction.getAmount().subtract(fee);
+        dto.setAmount(pureAmount.doubleValue());
         return dto;
     }
 
