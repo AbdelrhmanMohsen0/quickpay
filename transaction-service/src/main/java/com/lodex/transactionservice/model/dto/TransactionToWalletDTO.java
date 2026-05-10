@@ -18,6 +18,7 @@ public class TransactionToWalletDTO {
     private BigDecimal amount;
     private TransactionStatus status;
     private LocalDateTime timestamp;
+    private String rejectionReason;
 
     private BigDecimal fixedFees;
     private BigDecimal feePercentage;
