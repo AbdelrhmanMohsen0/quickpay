@@ -261,7 +261,7 @@ export function TransferPage() {
       </form>
 
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-        <DrawerContent>
+        <DrawerContent className="mx-auto max-w-md">
           <div className="mx-auto w-full max-w-sm">
             <DrawerHeader>
               <DrawerTitle>Confirm Transfer</DrawerTitle>

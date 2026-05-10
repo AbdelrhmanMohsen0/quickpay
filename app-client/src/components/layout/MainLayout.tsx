@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { User, Bell, Home, ArrowRightLeft, History, UserCircle, Sun, Moon } from "lucide-react";
+import api from "@/lib/axios";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/app/hooks/useAuth";
 import { useTheme } from "@/app/providers/theme-provider";
@@ -13,8 +15,20 @@ export function MainLayout({ children }: MainLayoutProps) {
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
 
-  // Mock notification count
-  const unreadNotifications = 3;
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+
+  useEffect(() => {
+    if (user) {
+      api.get("/notification/unread")
+        .then((res) => {
+          const count = Number(res.data);
+          setUnreadNotifications(!isNaN(count) ? count : 0);
+        })
+        .catch((err) => {
+          console.error("Failed to fetch unread notifications count:", err);
+        });
+    }
+  }, [user, location.pathname]);
 
   const navItems = [
     { name: "Home", path: "/", icon: Home },
