@@ -121,6 +121,7 @@ public class TransactionMapper implements ITransactionMapper {
         transaction.setAmount(dto.getAmount());
         transaction.setStatus(dto.getStatus());
         transaction.setTimestamp(dto.getTimestamp());
+        transaction.setRejectionReason(dto.getRejectionReason());
         return transaction;
     }
 }
