@@ -75,7 +75,8 @@ const renderMessageWithAmount = (message: string, metadataString?: string) => {
 export function NotificationsPage() {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const [selectedNotification, setSelectedNotification] =
+    useState<Notification | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -187,6 +188,31 @@ export function NotificationsPage() {
     }
   };
 
+  const handleNotificationClick = async (notification: Notification) => {
+    setSelectedNotification(notification);
+
+    if (notification.status === "UNREAD") {
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notification.id ? { ...n, status: "READ" } : n
+        )
+      );
+
+      try {
+        await api.patch(
+          `/notification/mark-as-read?notificationId=${notification.id}`
+        );
+      } catch (error) {
+        console.error("Failed to mark notification as read:", error);
+        setNotifications((prev) =>
+          prev.map((n) =>
+            n.id === notification.id ? { ...n, status: "UNREAD" } : n
+          )
+        );
+      }
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-muted/30 md:mx-auto md:max-w-md md:border-x md:shadow-sm">
       {/* Header */}
@@ -222,6 +248,8 @@ export function NotificationsPage() {
               <>
                 {notifications.map((notification, index) => {
                   const colorClass = getIconColorForType(notification.type);
+                  const isUnread = notification.status === "UNREAD";
+
                   return (
                     <div
                       ref={
@@ -230,33 +258,69 @@ export function NotificationsPage() {
                           : undefined
                       }
                       key={notification.id}
-                      onClick={() => setSelectedNotification(notification)}
-                      className="flex h-[104px] cursor-pointer items-center gap-4 p-4 transition-colors hover:bg-muted/30"
+                      onClick={() => handleNotificationClick(notification)}
+                      className={cn(
+                        "flex h-[104px] cursor-pointer items-center gap-4 p-4 transition-colors hover:bg-muted/30",
+                        isUnread ? "bg-background" : "bg-muted/10 opacity-70"
+                      )}
                     >
-                      <div
-                        className={cn(
-                          "flex size-14 shrink-0 items-center justify-center rounded-full border-12",
-                          colorClass
-                        )}
-                      >
-                        {getIconForType(notification.type)}
-                      </div>
+                      {" "}
+                      <div className="relative">
+                        {" "}
+                        <div
+                          className={cn(
+                            "flex size-14 shrink-0 items-center justify-center rounded-full border-12",
+                            colorClass
+                          )}
+                        >
+                          {" "}
+                          {getIconForType(notification.type)}{" "}
+                        </div>{" "}
+                        {isUnread && (
+                          <span className="absolute -top-0.5 -right-0.5 size-3.5 rounded-full border-2 border-background bg-blue-500" />
+                        )}{" "}
+                      </div>{" "}
                       <div className="flex flex-1 flex-col overflow-hidden">
+                        {" "}
                         <div className="flex items-center justify-between gap-2">
-                          <span className="truncate text-sm font-bold tracking-tight">
-                            {notification.title}
-                          </span>
-                          <span className="shrink-0 text-[10px] font-bold whitespace-nowrap text-muted-foreground">
-                            {formatRelativeTime(notification.createdAt)}
-                          </span>
-                        </div>
-                        <span className="mt-0.5 truncate text-sm text-muted-foreground">
+                          {" "}
+                          <span
+                            className={cn(
+                              "truncate text-sm tracking-tight",
+                              isUnread
+                                ? "font-bold text-foreground"
+                                : "font-medium text-muted-foreground"
+                            )}
+                          >
+                            {notification.title}{" "}
+                          </span>{" "}
+                          <span
+                            className={cn(
+                              "shrink-0 text-[10px] whitespace-nowrap",
+                              isUnread
+                                ? "font-bold text-muted-foreground"
+                                : "font-medium text-muted-foreground/70"
+                            )}
+                          >
+                            {" "}
+                            {formatRelativeTime(notification.createdAt)}{" "}
+                          </span>{" "}
+                        </div>{" "}
+                        <span
+                          className={cn(
+                            "mt-0.5 truncate text-sm",
+                            isUnread
+                              ? "font-medium text-foreground"
+                              : "text-muted-foreground"
+                          )}
+                        >
+                          {" "}
                           {renderMessageWithAmount(
                             notification.shortMessage || notification.message,
                             notification.metadata
-                          )}
-                        </span>
-                      </div>
+                          )}{" "}
+                        </span>{" "}
+                      </div>{" "}
                     </div>
                   );
                 })}
@@ -281,20 +345,26 @@ export function NotificationsPage() {
         )}
       </div>
 
-      <Dialog open={!!selectedNotification} onOpenChange={(open) => !open && setSelectedNotification(null)}>
+      <Dialog
+        open={!!selectedNotification}
+        onOpenChange={(open) => !open && setSelectedNotification(null)}
+      >
         <DialogContent className="flex max-h-[80vh] flex-col gap-0 overflow-hidden p-0">
           <div className="shrink-0 p-6 pb-4">
             <DialogHeader>
               <DialogTitle>{selectedNotification?.title}</DialogTitle>
               <DialogDescription>
                 {selectedNotification &&
-                  new Date(selectedNotification.createdAt).toLocaleString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  new Date(selectedNotification.createdAt).toLocaleString(
+                    undefined,
+                    {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}
               </DialogDescription>
             </DialogHeader>
           </div>
@@ -305,7 +375,7 @@ export function NotificationsPage() {
                 selectedNotification.metadata
               )}
           </div>
-          <div className="mt-auto shrink-0 sticky bottom-0 border-t bg-popover p-6 pt-4">
+          <div className="sticky bottom-0 mt-auto shrink-0 border-t bg-popover p-6 pt-4">
             <DialogFooter showCloseButton />
           </div>
         </DialogContent>
