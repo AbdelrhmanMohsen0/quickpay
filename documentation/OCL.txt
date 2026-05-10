@@ -1,0 +1,31 @@
+context Wallet
+
+-- The userId cannot be null (translates 'nullable = false')
+inv UserIdNotNull: self.userId <> null
+
+-- The userId must be unique across all wallets (translates 'unique = true')
+inv UniqueUserId: Wallet.allInstances()->isUnique(userId)
+
+-- The balance must never drop below zero (Standard financial business rule)
+inv NonNegativeBalance: self.balance >= 0
+
+
+
+
+context Transaction
+
+-- The idempotency key cannot be null (translates 'nullable = false')
+inv IdempotencyKeyNotNull: self.idempotencyKey <> null
+
+-- The idempotency key must be completely unique (translates 'unique = true')
+inv UniqueIdempotencyKey: Transaction.allInstances()->isUnique(idempotencyKey)
+
+-- The transaction amount must be greater than zero
+inv ValidAmount: self.amount > 0
+
+-- The transaction fee cannot be negative
+inv ValidFee: self.fee >= 0
+
+-- If a transaction is rejected, a rejection reason must be provided
+inv RejectionReasonRequired: 
+    self.status = TransactionStatus::REJECTED implies self.rejectionReason <> null
